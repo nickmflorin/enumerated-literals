@@ -11,6 +11,8 @@ At it's core, the `enumerated-literals` package provides a method, `enumeratedLi
 used to define and group constant string literals in an `enum`-like fashion:
 
 ```ts
+import { enumeratedLiterals } from "enumerated-literals";
+
 const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
 type Fruit = EnumeratedLiteralType<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
 
@@ -379,39 +381,116 @@ Fruits.getAttributes("description");
 ##### `values` (_property_)
 
 ```ts
-enumeratedLiterals(..., {}).values;
+LiteralsValues<L>;
 ```
 
 ##### `models` (_property_)
 
 ```ts
-enumeratedLiterals(..., {}).models;
+LiteralsModels<L>;
 ```
 
 ##### `zodSchema` (_property_)
 
+Returns a `zod.ZodUnion` that can be used to validate a value when parsing with `zod`.
+
 ```ts
-enumeratedLiterals(..., {}).zodSchema;
+z.ZodUnion<
+  readonly [z.ZodLiteral<LiteralsValues<L>[number]>, ...z.ZodLiteral<LiteralsValues<L>[number]>[]]
+>;
+```
+
+###### Example
+
+```ts
+import { enumeratedLiterals } from "enumerated-literals";
+
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+type Fruit = EnumeratedLiteralType<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
+
+const MyFruitSchema = z.object({
+  name: Fruits.schema,
+  id: z.string(),
+});
 ```
 
 #### Methods
 
 ##### `assert` (_method_)
 
+A type assertion that throws an `Error` if the provided value is not in the set of constant string
+literal values on the `EnumeratedLiterals` instance.
+
 ```ts
-enumeratedLiterals(..., {}).assert;
+<L extends Literals> = (value: unknown, errorMessage?: string): asserts value is LiteralsValue<L>;
+```
+
+###### Example
+
+```ts
+import { enumeratedLiterals } from "enumerated-literals";
+
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+type Fruit = EnumeratedLiteralType<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
+
+function processFruit(fruit: Fruit) { ... }
+
+function process(value: unknown) {
+  Fruits.assert(value, "The value is not a fruit!");
+  processFruit(f);
+}
 ```
 
 ##### `parse` (_method_)
 
+Returns the provided value, typed as a value in the set of constant string literal values on the
+`EnumeratedLiterals` instance, if the value is indeed in that set. Otherwise, throws an `Error`.
+
 ```ts
-enumeratedLiterals(..., {}).parse;
+(v: unknown, errorMessage?: string): LiteralsValue<L>;
+```
+
+###### Example
+
+```ts
+import { enumeratedLiterals } from "enumerated-literals";
+
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+type Fruit = EnumeratedLiteralType<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
+
+function processFruit(fruit: Fruit) { ... }
+
+function process(value: unknown) {
+  const f = Fruits.parse(value); // Typed as 'Fruit'
+  processFruit(f);
+}
 ```
 
 ##### `contains` (_method_)
 
+A typeguard that returns whether or not the provided value is in the set of constant string literal
+values on the `EnumeratedLiterals` instance.
+
 ```ts
-enumeratedLiterals(..., {}).contains;
+(v: unknown): v is LiteralsValue<L>;
+```
+
+###### Example
+
+```ts
+import { enumeratedLiterals } from "enumerated-literals";
+
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+type Fruit = EnumeratedLiteralType<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
+
+function processFruit(fruit: Fruit) { ... }
+
+function process(value: unknown) {
+  if (Fruits.contains(value)) {
+    // 'value' is of type 'Fruit'
+    processFruit(value);
+  }
+}
 ```
 
 ##### `getModel` (_method_)
