@@ -4,6 +4,10 @@
   "description": "The `enumerated-literals` package provides a strongly-typed, type-safe and convenient pattern for defining and manage constant strings in an application.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nickmflorin/enumerated-literals.git"
+  },
   "dependencies": {
     "autoprefixer": "^10.4.19",
     "lodash.difference": "^4.5.0",
