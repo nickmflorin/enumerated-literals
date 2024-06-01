@@ -56,7 +56,7 @@ export type EnumeratedLiteralsType<L> =
   L extends EnumeratedLiterals<
     infer Ll extends Literals,
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-    infer O
+    infer _O
   >
     ? LiteralsValue<Ll>
     : never;
@@ -65,7 +65,7 @@ export type EnumeratedLiteralsModel<L> =
   L extends EnumeratedLiterals<
     infer Ll extends Literals,
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-    infer O
+    infer _O
   >
     ? LiteralsModel<Ll, LiteralsValue<Ll>>
     : never;

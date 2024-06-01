@@ -2,7 +2,7 @@ import { pathsToModuleNameMapper } from "ts-jest";
 
 import type { Config } from "jest";
 
-import tsConfig from "./tsconfig.json";
+import tsConfig from "../tsconfig.json";
 
 const compilerOptions = tsConfig.compilerOptions;
 

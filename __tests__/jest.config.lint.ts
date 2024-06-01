@@ -1,11 +1,13 @@
 import { type ModuleConfig, withModuleConfig } from "./jest.config.base";
 
+const base = __dirname.replace(/\/__tests__$/, "/src");
+
 /**
  * Returns the Jest configuration function that should be used in a linting (ESLint and/or Prettier)
  * environment.
  */
-export const withLintConfig = (__dirname: string, config: ModuleConfig) =>
-  withModuleConfig(__dirname, {
+export const withLintConfig = (config: ModuleConfig) =>
+  withModuleConfig(base, {
     ...config,
     /* Jest will respect our ESLint configuration in terms of what files should not be linted.
        However, by default Jest will only look for files that are denoted as being applicable for
@@ -15,8 +17,9 @@ export const withLintConfig = (__dirname: string, config: ModuleConfig) =>
        https://jestjs.io/docs/configuration#testmatch-arraystring
      */
     testMatch: [
+      `${base}/**/*`,
       `${__dirname}/**/*`,
-      `!${__dirname}/src/prisma/model/generated/**`,
+      `!${base}/dist/**/*`,
       ...(config.testMatch || []),
     ],
   });

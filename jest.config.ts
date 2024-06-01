@@ -1,4 +1,4 @@
-import { withApplicationConfig } from "./jest.config.base";
+import { withApplicationConfig } from "./__tests__/jest.config.base";
 
 /**
  * Defines the Jest "projects" that Jest will run in parallel, isolated threads.
@@ -8,7 +8,7 @@ import { withApplicationConfig } from "./jest.config.base";
  * as either jest-*.config.ts or jest.config.ts.
  */
 export default withApplicationConfig(__dirname, [
-  "<rootDir>/src/__tests__/unit/jest.config.ts",
-  "<rootDir>/jest.config.eslint.ts",
-  "<rootDir>/jest.config.prettier.ts",
+  "./__tests__/unit/jest.config.ts",
+  "./__tests__/jest.config.eslint.ts",
+  "./__tests__/jest.config.prettier.ts",
 ]);

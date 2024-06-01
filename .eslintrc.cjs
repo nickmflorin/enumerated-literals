@@ -121,12 +121,7 @@ module.exports = {
     "plugin:prettier/recommended",
   ],
   rules: TS_BASE_RULES,
-  ignorePatterns: [
-    "!.*",
-    "package.json",
-    "pnpm-lock.yaml",
-    "/node_modules/**",
-  ],
+  ignorePatterns: ["!.*", "package.json", "pnpm-lock.yaml", "/node_modules/**"],
   settings: {
     "import/resolver": {
       typescript: true,
