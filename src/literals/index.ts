@@ -143,7 +143,7 @@ export const enumeratedLiterals = <L extends Literals, O extends EnumeratedLiter
               `the explicitly provided accessor, '${derivation.raw}'.` +
               "The provided accessors and/or values must all map to unique accessor values. " +
               `Either provide an explicit accessor value for the value '${existingDerivation.raw}',` +
-              `change the accessor value '${derivation.accessor}'` +
+              `change the accessor value '${derivation.accessor}' ` +
               "or configure the accessor options such that the two do not " +
               "map to the same accessor.",
           );
