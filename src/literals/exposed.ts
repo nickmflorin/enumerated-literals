@@ -71,27 +71,11 @@ export type EnumeratedLiteralsModel<L> =
     : never;
 
 /**
- * A generic type that results in a type referred to internally as a set of "EnumeratedLiterals",
- * which is formed from the strings defined in the read-only array type defined by the generic type
- * parameter {@link V}.
+ * A generic type that represents the return of the {@link enumeratedLiterals} method.
  *
- * Generally, a set of {@link EnumeratedLiterals} is defined as an object that is used to represent
- * the discrete, literal {@link string} values that a given variable can exhibit, by providing both
- * properties to access the discrete values themselves and a property to access an {@link Array} of
- * all possible discrete values.
- *
- * This type should be used when defining discrete values that a variable can exhibit.
- *
- * Usage
- * -----
- * Assume that we have a variable Permission that can take on values "admin", "dev" or "user".  The
- * {@link EnumeratedLiterals} of those values can be represented as:
- *
- *   EnumeratedLiterals<readonly ["admin", "dev", "user"]>
- *
- * Which will look as follows:
- *
- *   { ADMIN: "admin", DEV: "dev", USER: "user", __ALL__: readonly ["admin", "dev", "user"] }
+ * Generally, this type represents a set of discrete, constant string literal values as an object
+ * containing those values, attributes used to access those values individually, and a handful of
+ * strongly-typed methods related to those values.
  */
 export type EnumeratedLiterals<
   L extends Literals,
@@ -166,7 +150,7 @@ export type EnumeratedLiterals<
    * const NewConstants = Constants.pick(["a", "d"] as const);
    */
   readonly pick: <
-    T extends readonly string[],
+    T extends readonly LiteralsValues<L>[number][],
     Ot extends EnumeratedLiteralsDynamicOptions<ExtractLiterals<L, T>>,
   >(
     vs: T,
@@ -187,7 +171,7 @@ export type EnumeratedLiterals<
    * const NewConstants = Constants.omit(["b"] as const);
    */
   readonly omit: <
-    T extends readonly string[],
+    T extends readonly LiteralsValues<L>[number][],
     Ot extends EnumeratedLiteralsDynamicOptions<ExcludeLiterals<L, T>>,
   >(
     vs: T,

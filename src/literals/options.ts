@@ -78,6 +78,28 @@ export const ENUMERATED_LITERALS_STATIC_OPTIONS = [
   "accessorCase",
 ] as const;
 
+type EnumeratedLiteralsStaticOption = (typeof ENUMERATED_LITERALS_STATIC_OPTIONS)[number];
+
+type EnumeratedLiteralsStaticOptions<
+  L extends Literals,
+  O extends EnumeratedLiteralsOptions<L>,
+> = Pick<O, EnumeratedLiteralsStaticOption & keyof O>;
+
+export const pickStaticOptions = <L extends Literals, O extends EnumeratedLiteralsOptions<L>>(
+  opts: O,
+): EnumeratedLiteralsStaticOptions<L, O> => {
+  let staticOptions: EnumeratedLiteralsStaticOptions<L, O> = {} as EnumeratedLiteralsStaticOptions<
+    L,
+    O
+  >;
+  for (const k of ENUMERATED_LITERALS_STATIC_OPTIONS) {
+    if (opts[k] !== undefined) {
+      staticOptions = { ...staticOptions, [k]: opts[k] };
+    }
+  }
+  return staticOptions;
+};
+
 export type OptionsWithNewSet<
   L extends Literals,
   O extends EnumeratedLiteralsDynamicOptions<L>,

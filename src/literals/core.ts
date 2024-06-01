@@ -104,7 +104,7 @@ export type LiteralsModels<L extends Literals> = L extends LiteralsArray
 
 export type ExtractLiteralsFromModelArray<
   L extends LiteralsBaseModelArray,
-  I extends readonly string[],
+  I extends readonly LiteralsValues<L>[number][],
 > = L extends readonly [infer Li extends LiteralsBaseModel]
   ? Li["value"] extends I[number]
     ? readonly [Li]
@@ -117,7 +117,7 @@ export type ExtractLiteralsFromModelArray<
 
 export type ExtractLiteralsFromArray<
   L extends LiteralsArray,
-  I extends readonly string[],
+  I extends readonly LiteralsValues<L>[number][],
 > = L extends readonly [infer Li extends string]
   ? Li extends I[number]
     ? readonly [Li]
@@ -130,7 +130,7 @@ export type ExtractLiteralsFromArray<
 
 export type ExtractLiterals<
   L extends Literals,
-  I extends readonly string[],
+  I extends readonly LiteralsValues<L>[number][],
 > = L extends LiteralsArray
   ? ExtractLiteralsFromArray<L, I>
   : L extends LiteralsBaseModelArray
@@ -139,35 +139,35 @@ export type ExtractLiterals<
 
 export type ExcludeLiteralsFromModelArray<
   L extends LiteralsBaseModelArray,
-  I extends readonly string[],
+  I extends readonly LiteralsValues<L>[number][],
 > = L extends readonly [infer Li extends LiteralsBaseModel]
   ? Li["value"] extends I[number]
     ? readonly []
     : readonly [Li]
   : L extends readonly [infer H extends LiteralsBaseModel, ...infer R extends LiteralsBaseModel[]]
     ? H["value"] extends I[number]
-      ? ExtractLiteralsFromModelArray<R, I>
-      : readonly [H, ...ExtractLiteralsFromModelArray<R, I>]
+      ? ExcludeLiteralsFromModelArray<R, I>
+      : readonly [H, ...ExcludeLiteralsFromModelArray<R, I>]
     : never;
 
-export type ExcludeiteralsFromArray<
+export type ExcludeLiteralsFromArray<
   L extends LiteralsArray,
-  I extends readonly string[],
+  I extends readonly LiteralsValues<L>[number][],
 > = L extends readonly [infer Li extends string]
   ? Li extends I[number]
     ? readonly []
     : readonly [Li]
   : L extends readonly [infer H extends string, ...infer R extends LiteralsArray]
     ? H extends I[number]
-      ? ExtractLiteralsFromArray<R, I>
-      : readonly [H, ...ExtractLiteralsFromArray<R, I>]
+      ? ExcludeLiteralsFromArray<R, I>
+      : readonly [H, ...ExcludeLiteralsFromArray<R, I>]
     : never;
 
 export type ExcludeLiterals<
   L extends Literals,
-  I extends readonly string[],
+  I extends readonly LiteralsValues<L>[number][],
 > = L extends LiteralsArray
-  ? ExcludeiteralsFromArray<L, I>
+  ? ExcludeLiteralsFromArray<L, I>
   : L extends LiteralsBaseModelArray
     ? ExcludeLiteralsFromModelArray<L, I>
     : never;

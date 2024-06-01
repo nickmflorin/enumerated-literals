@@ -9,17 +9,10 @@
     "url": "https://github.com/nickmflorin/enumerated-literals.git"
   },
   "dependencies": {
-    "autoprefixer": "^10.4.19",
-    "lodash.difference": "^4.5.0",
-    "lodash.intersection": "^4.4.0",
-    "lodash.pick": "^4.4.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
-    "@types/lodash.difference": "^4.5.9",
-    "@types/lodash.intersection": "^4.4.9",
-    "@types/lodash.pick": "^4.4.9",
     "@typescript-eslint/eslint-plugin": "^7.11.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
@@ -42,7 +35,7 @@
   },
   "scripts": {
     "build": "npm run test:ci && npm run tsc",
-    "test": "jest --detectOpenHandles --forceExit",
+    "test": "jest --detectOpenHandles --forceExit --silent=false",
     "test:ci": "jest",
     "tsc": "tsc --project ./tsconfig.json"
   },

@@ -173,6 +173,16 @@ export const validateAccessor = <T extends string>(value: T): T => {
   return value;
 };
 
+const removeUndefined = <T extends Record<string, unknown>>(obj: T): T => {
+  let newObj: T = {} as T;
+  for (const k in obj) {
+    if (obj[k] !== undefined) {
+      newObj = { ...newObj, [k]: obj[k] };
+    }
+  }
+  return newObj;
+};
+
 export const toLiteralAccessor = <
   V extends string,
   L extends Literals,
@@ -182,7 +192,7 @@ export const toLiteralAccessor = <
   literals: L,
   options: O,
 ): LiteralsAccessor<V, L, O> => {
-  const opts = { ...getDefaultLiteralsAccessorOptions(literals), ...options };
+  const opts = { ...getDefaultLiteralsAccessorOptions(literals), ...removeUndefined(options) };
 
   let accessor: string = validateAccessor(v);
   // Remove white space that is more than 1 characters long.

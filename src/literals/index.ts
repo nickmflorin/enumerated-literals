@@ -1,6 +1,3 @@
-import difference from "lodash.difference";
-import intesection from "lodash.intersection";
-import pick from "lodash.pick";
 import { z } from "zod";
 
 import { humanizeList } from "../formatters";
@@ -26,9 +23,9 @@ import {
 } from "./exposed";
 import {
   type EnumeratedLiteralsOptions,
-  ENUMERATED_LITERALS_STATIC_OPTIONS,
   type EnumeratedLiteralsDynamicOptions,
   type OptionsWithNewSet,
+  pickStaticOptions,
 } from "./options";
 
 export {
@@ -160,7 +157,7 @@ export const enumeratedLiterals = <L extends Literals, O extends EnumeratedLiter
       }
     },
     pick<
-      T extends readonly string[],
+      T extends readonly LiteralsValues<L>[number][],
       Ot extends EnumeratedLiteralsDynamicOptions<ExtractLiterals<L, T>>,
     >(
       this: EnumeratedLiterals<L, O>,
@@ -170,15 +167,20 @@ export const enumeratedLiterals = <L extends Literals, O extends EnumeratedLiter
       ExtractLiterals<L, T>,
       OptionsWithNewSet<ExtractLiterals<L, T>, Ot, L, O>
     > {
-      const extracted = intesection([...this.values], [...vs]) as ExtractLiterals<L, T>;
-      const newOptions = {
-        ...pick(this.options, ENUMERATED_LITERALS_STATIC_OPTIONS),
+      const invalidValues = [...vs].filter(v => !this.contains(v));
+      if (invalidValues.length > 0) {
+        throw new Error(
+          `The values ${humanizeList(invalidValues)} are not valid members of this instance.`,
+        );
+      }
+      const extracted = this.values.filter(v => vs.includes(v)) as ExtractLiterals<L, T>;
+      return enumeratedLiterals(extracted, {
+        ...pickStaticOptions<L, O>(this.options),
         ...opts,
-      };
-      return enumeratedLiterals(extracted, newOptions);
+      } as OptionsWithNewSet<ExtractLiterals<L, T>, Ot, L, O>);
     },
     omit<
-      T extends readonly string[],
+      T extends readonly LiteralsValues<L>[number][],
       Ot extends EnumeratedLiteralsDynamicOptions<ExcludeLiterals<L, T>>,
     >(
       this: EnumeratedLiterals<L, O>,
@@ -188,11 +190,17 @@ export const enumeratedLiterals = <L extends Literals, O extends EnumeratedLiter
       ExcludeLiterals<L, T>,
       OptionsWithNewSet<ExcludeLiterals<L, T>, Ot, L, O>
     > {
-      const excluded = difference([...this.values], [...vs]) as ExcludeLiterals<L, T>;
+      const invalidValues = [...vs].filter(v => !this.contains(v));
+      if (invalidValues.length > 0) {
+        throw new Error(
+          `The values ${humanizeList(invalidValues)} are not valid members of this instance.`,
+        );
+      }
+      const excluded = [...this.values].filter(v => !vs.includes(v)) as ExcludeLiterals<L, T>;
       return enumeratedLiterals(excluded, {
-        ...pick(this.options, ENUMERATED_LITERALS_STATIC_OPTIONS),
+        ...pickStaticOptions<L, O>(this.options),
         ...opts,
-      });
+      } as OptionsWithNewSet<ExcludeLiterals<L, T>, Ot, L, O>);
     },
   };
 };
