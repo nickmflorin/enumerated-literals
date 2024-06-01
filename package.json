@@ -33,7 +33,7 @@
   },
   "scripts": {
     "build": "npm run test:ci && npm run tsc",
-    "test": "jest --watchAll  --silent=false",
+    "test": "jest --watchAll --silent=false --verbose=false",
     "test:ci": "jest",
     "tsc": "tsc --project ./tsconfig.json"
   },

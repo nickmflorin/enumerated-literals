@@ -1,6 +1,6 @@
 import { type ModuleConfig, withModuleConfig } from "./jest.config.base";
 
-const base = __dirname.replace(/\/__tests__$/, "/src");
+const base = __dirname.replace(/\/__tests__$/, "");
 
 /**
  * Returns the Jest configuration function that should be used in a linting (ESLint and/or Prettier)
@@ -16,10 +16,5 @@ export const withLintConfig = (config: ModuleConfig) =>
 
        https://jestjs.io/docs/configuration#testmatch-arraystring
      */
-    testMatch: [
-      `${base}/**/*`,
-      `${__dirname}/**/*`,
-      `!${base}/dist/**/*`,
-      ...(config.testMatch || []),
-    ],
+    testMatch: [`${base}/**/*`, `!${base}/dist/**/*`, ...(config.testMatch || [])],
   });

@@ -2,7 +2,9 @@ import { pathsToModuleNameMapper } from "ts-jest";
 
 import type { Config } from "jest";
 
-import tsConfig from "../tsconfig.json";
+import tsConfig from "../../tsconfig.json";
+
+const base = __dirname.replace(/\/__tests__$/, "").replace(/\/src$/, "");
 
 const compilerOptions = tsConfig.compilerOptions;
 
@@ -62,7 +64,7 @@ export const withBaseConfig = (rootDir: string, config: AllowedConfig): Config =
   rootDir,
   preset: "ts-jest",
   testEnvironment: "node",
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: __dirname }),
+  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, { prefix: base }),
 });
 
 /**

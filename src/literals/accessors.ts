@@ -7,6 +7,11 @@ import {
 
 export type AccessorCase = "upper" | "lower" | null;
 
+export type RemoveUnnecessaryWhiteSpace<S extends string> =
+  S extends `${infer L extends string}  ${infer R extends string}`
+    ? RemoveUnnecessaryWhiteSpace<`${L} ${R}`>
+    : S;
+
 export type ParseAccessorCase<
   L extends Literals,
   O extends EnumeratedLiteralsOptions<L>,
@@ -102,7 +107,11 @@ export type LiteralsAccessor<
   L extends Literals,
   O extends EnumeratedLiteralsOptions<L>,
 > = V extends string
-  ? FormatAccessorSpaces<FormatAccessorHyphens<FormatAccessorCase<V, L, O>, L, O>, L, O>
+  ? FormatAccessorSpaces<
+      FormatAccessorHyphens<FormatAccessorCase<RemoveUnnecessaryWhiteSpace<V>, L, O>, L, O>,
+      L,
+      O
+    >
   : never;
 
 export type EnumeratedLiteralsBaseModelArrayAccessors<
@@ -135,6 +144,34 @@ export type EnumeratedLiteralsAccessors<
     ? EnumeratedLiteralsBaseModelArrayAccessors<L, O>
     : never;
 
+const AccessorRegex = /^[A-Za-z]+[A-Za-z0-9-_\s]*$/;
+
+const InvalidAccessorConditions: { check: (v: string) => boolean; message: string }[] = [
+  {
+    check: v => v.trim().length !== v.length,
+    message: "The accessor must not contain leading or trailing whitespace.",
+  },
+  {
+    check: v => v.length === 0,
+    message: "The accessor must not be an empty string.",
+  },
+  {
+    check: v => !AccessorRegex.test(v),
+    message:
+      "The accessor must only contain alphanumeric characters, hyphens, underscores, " +
+      "and spaces, and it must begin with a alpha character.",
+  },
+];
+
+export const validateAccessor = <T extends string>(value: T): T => {
+  for (const { check, message } of InvalidAccessorConditions) {
+    if (check(value)) {
+      throw new Error(message);
+    }
+  }
+  return value;
+};
+
 export const toLiteralAccessor = <
   V extends string,
   L extends Literals,
@@ -146,7 +183,12 @@ export const toLiteralAccessor = <
 ): LiteralsAccessor<V, L, O> => {
   const opts = { ...getDefaultLiteralsAccessorOptions(literals), ...options };
 
-  let accessor = v as string;
+  let accessor: string = validateAccessor(v);
+  // Remove white space that is more than 1 characters long.
+  while (v.includes(" ".repeat(2))) {
+    accessor = v.replaceAll(" ".repeat(2), " ");
+  }
+
   if (opts.accessorCase === "upper") {
     accessor = accessor.toUpperCase();
   } else if (opts.accessorCase === "lower") {
