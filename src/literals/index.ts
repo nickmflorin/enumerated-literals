@@ -5,7 +5,7 @@ import { z } from "zod";
 
 import { humanizeList } from "../formatters";
 
-import { type EnumeratedLiteralsAccessors, toLiteralAccessor } from "./accessors";
+import { parseAccessors } from "./accessors";
 import {
   type Literals,
   type LiteralsValues,
@@ -39,12 +39,6 @@ export {
 
 type MoreThan2Array<V> = [V, V, ...V[]];
 
-type AccessorDerivation = {
-  raw: string;
-  source: "value" | "explicit";
-  accessor: string;
-};
-
 /**
  * A generic type that results in a type referred to internally as an "EnumeratedLiteralMap", which
  * is formed from the strings defined in the read-only array type defined by the generic type
@@ -72,91 +66,20 @@ export const enumeratedLiterals = <L extends Literals, O extends EnumeratedLiter
   literals: L,
   options: O,
 ): EnumeratedLiterals<L, O> => {
+  if ([...literals].length === 0) {
+    throw new Error(
+      "The 'enumeratedLiterals' method must be called with a non-empty array as its first " +
+        "argument.",
+    );
+  }
+
   const values = [...literals].map(l => (isLiteralModel(l) ? l.value : l)) as LiteralsValues<L>;
   const models = [...literals].map(l =>
     isLiteralModel(l) ? l : { value: l },
   ) as LiteralsModels<L>;
 
-  let derivations: AccessorDerivation[] = [];
-
-  const accessors: EnumeratedLiteralsAccessors<L, O> = [...literals].reduce<
-    EnumeratedLiteralsAccessors<L, O>
-  >(
-    (acc, curr) => {
-      const key = (isLiteralModel(curr) ? curr.value : curr) as string;
-
-      const existingValueDerivation = derivations.find(s => s.raw === key && s.source === "value");
-      if (existingValueDerivation) {
-        throw new Error(
-          `Encountered duplicate literal values, '${existingValueDerivation.raw}'. ` +
-            "The literal values must be unique!",
-        );
-      }
-
-      const derivation: AccessorDerivation =
-        isLiteralModel(curr) && curr.accessor !== undefined
-          ? {
-              source: "explicit",
-              accessor: toLiteralAccessor(curr.accessor, literals, options),
-              raw: curr.accessor,
-            }
-          : { source: "value", accessor: toLiteralAccessor(key, literals, options), raw: key };
-
-      const existingDerivation = derivations.find(s => s.accessor === derivation.accessor);
-      if (existingDerivation) {
-        if (existingDerivation.source === "value" && derivation.source === "value") {
-          throw new Error(
-            `Encountered two different values, '${key}' and '${existingDerivation.raw}', that ` +
-              `map to the same accessor '${existingDerivation.accessor}'!  Values must map to ` +
-              "unique accessors.  Either define the accessors explicitly for each value, such " +
-              "that they are different, or change the values themselves.",
-          );
-        } else if (existingDerivation.source === "explicit" && derivation.source === "explicit") {
-          if (existingDerivation.raw === derivation.raw) {
-            throw new Error(
-              `Encountered two identical accessor values, '${existingDerivation.raw}'. ` +
-                "Accessors must be unique! ",
-            );
-          }
-          throw new Error(
-            `Encountered two different accessor values, '${existingDerivation.raw}' and ` +
-              `'${derivation.raw}', that result in the same accessor, '${derivation.accessor}'! ` +
-              "The accessors must result in unique values.  Either change the accessor values " +
-              "or configure the accessor options such that the two provided accessors do not " +
-              "map to the same value.",
-          );
-        } else if (existingDerivation.source === "explicit" && derivation.source === "value") {
-          throw new Error(
-            `Encountered a value, '${derivation.raw}', that maps to the same accessor ` +
-              `('${derivation.accessor}') as ` +
-              `the explicitly provided accessor, '${existingDerivation.raw}'.` +
-              "The provided accessors and/or values must all map to unique accessor values. " +
-              `Either provide an explicit accessor value for the value '${derivation.raw}',` +
-              `change the accessor value '${existingDerivation.accessor}'` +
-              "or configure the accessor options such that the two do not " +
-              "map to the same accessor.",
-          );
-        } else {
-          throw new Error(
-            `Encountered a value, '${existingDerivation.raw}', that maps to the same ` +
-              `accessor ('${derivation.accessor}') as ` +
-              `the explicitly provided accessor, '${derivation.raw}'.` +
-              "The provided accessors and/or values must all map to unique accessor values. " +
-              `Either provide an explicit accessor value for the value '${existingDerivation.raw}',` +
-              `change the accessor value '${derivation.accessor}' ` +
-              "or configure the accessor options such that the two do not " +
-              "map to the same accessor.",
-          );
-        }
-      }
-      derivations = [...derivations, derivation];
-      return { ...acc, [derivation.accessor]: isLiteralModel(curr) ? curr.value : curr };
-    },
-    {} as EnumeratedLiteralsAccessors<L, O>,
-  );
-
   return {
-    ...accessors,
+    ...parseAccessors(literals, options),
     options,
     values,
     models,

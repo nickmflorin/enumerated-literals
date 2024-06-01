@@ -1,10 +1,6 @@
 import { enumeratedLiterals } from "~/literals";
 
 describe("the literals object is properly attributed with accessors", () => {
-  it("works", () => {
-    const literals = enumeratedLiterals(["foo", "bar"] as const, {});
-    expect(literals.BAR).toBe("bar");
-  });
   describe("the literals object returns the correct values for accessors", () => {
     describe(
       "the literals object returns the correct values for accessors when they are not " +
