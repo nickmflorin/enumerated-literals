@@ -1,6 +1,6 @@
 {
   "name": "enumerated-literals",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The `enumerated-literals` package provides a strongly-typed, type-safe and convenient pattern for defining and manage constant strings in an application.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -41,7 +41,11 @@
     "test:ci": "jest",
     "tsc": "tsc --project ./tsconfig.json"
   },
-  "keywords": ["literals", "enum", "constants"],
+  "keywords": [
+    "literals",
+    "enum",
+    "constants"
+  ],
   "author": "nickmflorin@gmail.com",
   "license": "ISC"
 }
