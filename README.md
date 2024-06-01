@@ -1,17 +1,66 @@
 # Enumerated Literals
 
-The `enumerated-literals` package provides a strongly-typed way to define, manage and associate
-constant string literals in an application.
+The `enumerated-literals` package provides a strongly-typed, type-safe and convenient pattern for
+defining and manage constant strings in an application.
+
+```bash
+npm install enumerated-literals
+```
+
+At it's core, the `enumerated-literals` package provides a method, `enumeratedLiterals`, that can be
+used to define and group constant string literals in an `enum`-like fashion:
 
 ```ts
 const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
 type Fruit = EnumeratedLiteralType<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
 
-Fruits.APPLE; // "apple"
-Fruits.BANANA; // "banana"
+Fruits.APPLE; // Typed as "apple"
+Fruits.BANANA; // Typed as "banana"
 
 const doSomethingWithFruit = (fruit: Fruit): void;
 doSomethingWithFruit("apple");
+```
+
+#### Terminology
+
+The following terms will be referenced throughout this documentation:
+
+##### The `EnumeratedLiterals` Instance:
+
+The `object` that is created and returned by the `enumeratedLiterals` method (e.g. `Fruits`).
+
+```ts
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+```
+
+##### The `EnumeratedLiterals` Values
+
+The constant string literal values that the `EnumeratedLiterals` instance contains (e.g. `"apple"`,
+`"banana"`, `"blueberry"`, `"orange"`).
+
+```ts
+Fruits.values; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
+```
+
+##### The `EnumeratedLiterals` Models
+
+The `object`(s) associated with each `EnumeratedLiterals` value on the `EnumeratedLiterals`
+instance. Each object contains the relevant `EnumeratedLiterals` value, indexed by the `value` key,
+along with additional key-value pairs that are associated with each value when provided on
+instantiation of the instance: `"banana"`, `"blueberry"`, `"orange"`).
+
+```ts
+// Typed as readonly [ { value: "apple" }, { value: "banana" }, { value: "blueberry" }, { value: "orange" }]
+Fruits.models;
+```
+
+##### The `EnumeratedLiterals` **Accessors**
+
+The properties of the `EnumeratedLiterals` instance that are used to access the `EnumeratedLiterals`
+values on the instance (e.g. `APPLE` or `BANANA`).
+
+```ts
+Fruits.APPLE; // Typed as "apple"
 ```
 
 ### Motivation
@@ -101,17 +150,9 @@ However, defining constant string literals in this manner has the following draw
 
 1.  The values represented by the `Fruit` type do not have `enum`-like accessors, like
     `Fruits.APPLE`, or `Fruits.BANANA`.
-
 2.  As with the `enum` object, associating the values represented by the `Fruit` type with other
     constant values and/or definitions requires the addition of additional types, data structures
     and/or definitions.
-
-### Terminology
-
-1. **`EnumeratedLiterals` Instance**: The `object` that is created and returned by the
-   `enumeratedLiterals` method.
-2. **Accessors**: The properties of the `EnumeratedLiterals` instance that are used to access the
-   constant string literals on the object (e.g. `Fruits.APPLE`).
 
 ### Usage
 
@@ -131,14 +172,14 @@ The constant string literals, `"apple"`, `"banana"`, `"blueberry"`, and `"orange
 as properties of the `Fruits` object:
 
 ```ts
-Fruits.APPLE; // "apple"
+Fruits.APPLE; // Typed as "apple"
 ```
 
 The constant string literal values on the `EnumeratedLiterals` instance can be accessed as a
 `readonly` array as follows:
 
 ```ts
-Fruits.values; // readonly ["apple", "banana", "blueberry", "orange"]
+Fruits.values; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
 ```
 
 #### Custom Accessors
@@ -158,8 +199,8 @@ const Fruits = enumeratedLiterals(
   {},
 );
 
-Fruits.Apple; // "apple"
-Fruits.values; // readonly ["apple", "banana", "blueberry", "orange"]
+Fruits.Apple; // Typed as "apple"
+Fruits.values; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
 ```
 
 #### Built-In Type Checking
@@ -187,7 +228,7 @@ function processFruit(fruit: Fruit) { ... }
 
 function process(value: unknown) {
   if (Fruits.contains(value)) {
-    // value
+    // 'value' is of type 'Fruit'
     processFruit(value);
   }
 }
@@ -208,12 +249,12 @@ function process(value: unknown) {
 }
 ```
 
-#### Associating Other Values
+#### `EnumeratedLiterals` Model
 
-An `EnumeratedLiterals` instance can be instantiated such that the constant string literals it
-contains are associated with other values, constants or functions. These other values, constants or
-functions will be tied to each value of the `EnumeratedLiterals` instance in a strongly typed
-fashion.
+An `EnumeratedLiterals` instance can be instantiated such that the constant string literal values it
+contains are associated with other values, constants and/or functions. These other values, constants
+and/or functions will be tied to each value of the `EnumeratedLiterals` instance in a strongly typed
+fashion:
 
 ```ts
 const Fruits = enumeratedLiterals(
@@ -225,17 +266,9 @@ const Fruits = enumeratedLiterals(
   ] as const,
   {},
 );
-```
 
-The `Fruits` instance exposes a `models` attribute, along with additional methods, that can be used
-to obtain the associated values of the `EnumeratedLiterals` instance. The `models` attribute will
-return the `value` of each constant string literal on the instance, along with any other associated
-values, in an array of `object`(s) that is in the same order as the `values` that were used to
-instantiate the instance:
-
-```ts
-Fruits.values; // readonly ["apple", "banana", "blueberry", "orange"]
-/* readonly [
+Fruits.values; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
+/* Typed as readonly [
   { value: "apple"; description: "A red fruit"; color: "red"; label: "Apple"; },
   { value: "banana"; description: "A yellow fruit"; color: "yellow"; label: "Banana"; },
   { value: "blueberry"; description: "A blue fruit"; color: "blue"; label: "Blueberry"; },
@@ -244,32 +277,101 @@ Fruits.values; // readonly ["apple", "banana", "blueberry", "orange"]
 Fruits.models;
 ```
 
-### Advanced Usage
+The `models` attribute will return the `value` of each constant string literal on the instance,
+along with any other associated properties, in an array of `object`(s) that is in the same order as
+the `values` that were used to instantiate the instance.
 
-#### The `EnumeratedLiteralsModel`
+##### The `EnumeratedLiteralsModel` Type
+
+The `EnumeratedLiteralsModel` type can be used to type the `models` that are contained on an
+`EnumeratedLiterals` instance.
+
+One common use case is to define a type for both the `value` and `model` of an `EnumeratedLiterals`
+instance, separately, and allow the `model` to be extracted based on the `value`:
 
 ```ts
-const Fruits = enumeratedLiterals(
-  [
-    { value: "apple", description: "A red fruit", color: "red", label: "Apple" },
-    { value: "banana", description: "A yellow fruit", color: "yellow", label: "Banana" },
-    { value: "blueberry", description: "A blue fruit", color: "blue", label: "Blueberry" },
-    { value: "orange", description: "An orange fruit", color: "orange", label: "Orange" },
-  ] as const,
-  {},
-);
+// "apple" | "banana" | "blueberry" | "orange"
+type FruitValue = EnumeratedLiteralIdType<typeof Fruits>;
 
-type FruitId = EnumeratedLiteralIdType<typeof Fruits>;
-
-type Fruit<I extends FruitId = FruitId> = Extract<
+type Fruit<I extends FruitValue = FruitValue> = Extract<
   EnumeratedLiteralsModel<typeof Fruits>,
   { value: I }
 >;
+
+/*
+ | { value: "apple"; description: "A red fruit"; color: "red"; label: "Apple"; }
+ | { value: "banana"; description: "A yellow fruit"; color: "yellow"; label: "Banana"; }
+ | { value: "blueberry"; description: "A blue fruit"; color: "blue"; label: "Blueberry"; }
+ | { value: "orange"; description: "An orange fruit"; color: "orange"; label: "Orange"; }
+*/
+type AnyFruit = Fruit;
+
+// { value: "apple"; description: "A red fruit"; color: "red"; label: "Apple"; }
+type Apple = Fruit<"apple">;
+```
+
+An `EnumeratedLiterals` instance is equipped with the following methods that can be used to interact
+with the `EnumeratedLiterals` models:
+
+##### Model Getters
+
+The `EnumeratedLiterals` instance is equipped with a method, `getModel`, that can be used to
+retrieve the model associated with a specific value on the `EnumeratedLiterals` instance. The return
+type will be strongly typed, such that the properties associated with the provided value will be
+their constant representations:
+
+```ts
+// Typed as { value: "apple"; description: "A red fruit"; color: "red"; label: "Apple"; }
+Fruits.getModel("apple");
+```
+
+The method will throw an `Error` if the provided value is not in the set of constant string literals
+on the instance.
+
+The arguments to the methods are all strongly typed, such that the following code will not compile:
+
+```ts
+Fruits.getModel("cucumber");
+```
+
+Similarly, `EnumeratedLiterals` instance is equipped with a `getModelSafe` method, that allows
+whether or not an `Error` should be thrown in the case that the value provided is not in the set of
+constant string literals on the instance or the method should simply return `null` to be controlled
+via a `strict` option:
+
+```ts
+Fruits.getModelSafe("cucumber", { strict: true }); // Throws Error, but compiles
 ```
 
 ```ts
-Fruits.getModel("apple").
-
+Fruits.getModelSafe("apple", { strict: false }); // Compiles, returns `string | null`.
 ```
 
-## API
+##### Attribute Getters
+
+The `EnumeratedLiterals` instance is equipped with a methods, `getAttribute` and `getAttributes`,
+that can be used to access the attributes of a single model or all models on the
+`EnumeratedLiterals` instance, respectively:
+
+```ts
+Fruits.getAttribute("apple", "description"); // Typed as "A red fruit"
+```
+
+The following will not compile:
+
+```ts
+Fruits.getAttribute("cucumber", "description");
+```
+
+The `getAttributes` method can be used to return the associated attribute of all models on the
+`EnumeratedLiterals` instance, in the same order as the `values` that were used to instantiate the
+instance:
+
+```ts
+// Typed as readonly ["A red fruit", "A yellow fruit", "A blue fruit", "An orange fruit"]
+Fruits.getAttributes("description");
+```
+
+### API
+
+Documentation TK.
