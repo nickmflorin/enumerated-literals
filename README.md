@@ -374,4 +374,78 @@ Fruits.getAttributes("description");
 
 ### API
 
-Documentation TK.
+#### Properties
+
+##### `values` (_property_)
+
+```ts
+enumeratedLiterals(..., {}).values;
+```
+
+##### `models` (_property_)
+
+```ts
+enumeratedLiterals(..., {}).models;
+```
+
+##### `zodSchema` (_property_)
+
+```ts
+enumeratedLiterals(..., {}).zodSchema;
+```
+
+#### Methods
+
+##### `assert` (_method_)
+
+```ts
+enumeratedLiterals(..., {}).assert;
+```
+
+##### `parse` (_method_)
+
+```ts
+enumeratedLiterals(..., {}).parse;
+```
+
+##### `contains` (_method_)
+
+```ts
+enumeratedLiterals(..., {}).contains;
+```
+
+##### `getModel` (_method_)
+
+```ts
+enumeratedLiterals(..., {}).getModel;
+```
+
+##### `getModelSafe` (_method_)
+
+```ts
+enumeratedLiterals(..., {}).getModelSafe;
+```
+
+##### `getAttribute` (_method_)
+
+```ts
+enumeratedLiterals(..., {}).getAttribute;
+```
+
+##### `getAttributes` (_method_)
+
+```ts
+enumeratedLiterals(..., {}).getAttributes;
+```
+
+##### `pick` (_method_)
+
+```ts
+enumeratedLiterals(..., {}).pick;
+```
+
+##### `omit` (_method_)
+
+```ts
+enumeratedLiterals(..., {}).omit;
+```

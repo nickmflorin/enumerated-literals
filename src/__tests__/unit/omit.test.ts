@@ -32,7 +32,7 @@ describe(
           expect(SubsetLiterals.ORANGE).toBe("orange");
         });
 
-        it("returns an object that excludes non-omited accessors", () => {
+        it("returns an object that excludes omited accessors", () => {
           expect(SubsetLiterals["APPLE" as keyof typeof SubsetLiterals]).toBeUndefined();
           expect(SubsetLiterals["BLUEBERRY" as keyof typeof SubsetLiterals]).toBeUndefined();
         });
@@ -56,7 +56,7 @@ describe(
           expect(SubsetLiterals.ORANGE).toBe("orange");
         });
 
-        it("returns an object that excludes non-omited accessors", () => {
+        it("returns an object that excludes omited accessors", () => {
           expect(SubsetLiterals["APPLE" as keyof typeof SubsetLiterals]).toBeUndefined();
           expect(SubsetLiterals["BLUEBERRY" as keyof typeof SubsetLiterals]).toBeUndefined();
         });
