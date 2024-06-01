@@ -1,8 +1,9 @@
-name: publish-npm
+name: run-tests
 
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - "main"
 
 jobs:
   build:
@@ -13,9 +14,8 @@ jobs:
         with:
           node-version: 16
       - run: npm ci
-      - run: npm run test:ci
 
-  publish-npm:
+  tests:
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -23,8 +23,4 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-          registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+      - run: npm run test:ci
