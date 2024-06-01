@@ -17,6 +17,10 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
+    "@types/lodash.difference": "^4.5.9",
+    "@types/lodash.intersection": "^4.4.9",
+    "@types/lodash.pick": "^4.4.9",
+    "@typescript-eslint/eslint-plugin": "^7.11.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-node": "^0.3.9",
@@ -38,7 +42,7 @@
   },
   "scripts": {
     "build": "npm run test:ci && npm run tsc",
-    "test": "jest --watchAll --silent=false --verbose=false",
+    "test": "jest --detectOpenHandles --forceExit",
     "test:ci": "jest",
     "tsc": "tsc --project ./tsconfig.json"
   },

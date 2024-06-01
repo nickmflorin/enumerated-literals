@@ -1,82 +1,165 @@
 import { enumeratedLiterals } from "~/literals";
 
 describe("the literals object is properly attributed with accessors", () => {
+  it("works", () => {
+    const literals = enumeratedLiterals(["foo", "bar"] as const, {});
+    expect(literals.BAR).toBe("bar");
+  });
   describe("the literals object returns the correct values for accessors", () => {
     describe(
       "the literals object returns the correct values for accessors when they are not " +
         "explicitly defined",
       () => {
-        const ACCESSORS = [
-          ["APPLE", "apple"],
-          ["BANANA", "banana"],
-          ["BLUEBERRY", "blueberry"],
-          ["ORANGE", "orange"],
-        ] as const satisfies [string, string][];
-
-        const Literals = enumeratedLiterals(
-          ["apple", "banana", "blueberry", "orange"] as const,
-          {},
+        describe(
+          "the literals object returns the correct values for accessors when no " +
+            "casing is used",
+          () => {
+            const ACCESSORS = [
+              ["APPLE", "apple"],
+              ["BANANA", "banana"],
+              ["BLUEBERRY", "blueberry"],
+              ["ORANGE", "orange"],
+            ] as const satisfies [string, string][];
+            const Literals = enumeratedLiterals(
+              ["apple", "banana", "blueberry", "orange"] as const,
+              {},
+            );
+            test.each(ACCESSORS)("(accessor = %s)", (accessor, value) => {
+              expect(Literals[accessor]).toBe(value);
+            });
+          },
         );
-
-        test.each(ACCESSORS)("(accessor = %s)", (accessor, value) => {
-          expect(Literals[accessor]).toBe(value);
-        });
-      },
-    );
-    describe(
-      "the literals object returns the correct values for accessors when they are not " +
-        "explicitly defined but configured to use lower casing",
-      () => {
-        const ACCESSORS = [
-          ["apple", "apple"],
-          ["banana", "banana"],
-          ["blueberry", "blueberry"],
-          ["orange", "orange"],
-        ] as const satisfies [string, string][];
-
-        const Literals = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {
-          accessorCase: "lower",
-        });
-        test.each(ACCESSORS)("(accessor = %s)", (accessor, value) => {
-          expect(Literals[accessor]).toBe(value);
-        });
+        describe(
+          "the literals object returns the correct values for accessors when upper " +
+            "casing is used",
+          () => {
+            const ACCESSORS = [
+              ["APPLE", "apple"],
+              ["BANANA", "banana"],
+              ["BLUEBERRY", "blueberry"],
+              ["ORANGE", "orange"],
+            ] as const satisfies [string, string][];
+            const Literals = enumeratedLiterals(
+              ["apple", "banana", "blueberry", "orange"] as const,
+              {
+                accessorCase: "upper",
+              },
+            );
+            test.each(ACCESSORS)("(accessor = %s)", (accessor, value) => {
+              expect(Literals[accessor]).toBe(value);
+            });
+          },
+        );
+        describe(
+          "the literals object returns the correct values for accessors when lower " +
+            "casing is used",
+          () => {
+            const ACCESSORS = [
+              ["apple", "apple"],
+              ["banana", "banana"],
+              ["blueberry", "blueberry"],
+              ["orange", "orange"],
+            ] as const satisfies [string, string][];
+            const Literals = enumeratedLiterals(
+              ["apple", "banana", "blueberry", "orange"] as const,
+              {
+                accessorCase: "lower",
+              },
+            );
+            test.each(ACCESSORS)("(accessor = %s)", (accessor, value) => {
+              expect(Literals[accessor]).toBe(value);
+            });
+          },
+        );
       },
     );
     describe(
       "the literals object returns the correct values for accessors when they are " +
         "explicitly defined",
       () => {
-        const ACCESSORS = [
-          ["apple", "apple"],
-          ["banana", "banana"],
-          ["blueberry", "blueberry"],
-          ["orange", "orange"],
-        ] as const satisfies [string, string][];
-
-        const Literals = enumeratedLiterals(
-          [
-            { accessor: "apple", value: "apple" },
-            { accessor: "banana", value: "banana" },
-            { accessor: "blueberry", value: "blueberry" },
-            { accessor: "orange", value: "orange" },
-          ] as const,
-          {},
+        describe(
+          "the literals object returns the correct values for accessors when upper " +
+            "casing is used",
+          () => {
+            const ACCESSORS = [
+              ["APPLE", "apple"],
+              ["BANANA", "banana"],
+              ["BLUEBERRY", "blueberry"],
+              ["ORANGE", "orange"],
+            ] as const satisfies [string, string][];
+            const Literals = enumeratedLiterals(
+              [
+                { accessor: "apple", value: "apple" },
+                { accessor: "banana", value: "banana" },
+                { accessor: "blueberry", value: "blueberry" },
+                { accessor: "orange", value: "orange" },
+              ] as const,
+              { accessorCase: "upper" },
+            );
+            test.each(ACCESSORS)("(accessor = %s)", (accessor, value) => {
+              expect(Literals[accessor]).toBe(value);
+            });
+          },
         );
-        test.each(ACCESSORS)("(accessor = %s)", (accessor, value) => {
-          expect(Literals[accessor]).toBe(value);
-        });
+        describe(
+          "the literals object returns the correct values for accessors when no " +
+            "casing is used",
+          () => {
+            const ACCESSORS = [
+              ["apple", "apple"],
+              ["banana", "banana"],
+              ["blueberry", "blueberry"],
+              ["orange", "orange"],
+            ] as const satisfies [string, string][];
+            const Literals = enumeratedLiterals(
+              [
+                { accessor: "apple", value: "apple" },
+                { accessor: "banana", value: "banana" },
+                { accessor: "blueberry", value: "blueberry" },
+                { accessor: "orange", value: "orange" },
+              ] as const,
+              {},
+            );
+            test.each(ACCESSORS)("(accessor = %s)", (accessor, value) => {
+              expect(Literals[accessor]).toBe(value);
+            });
+          },
+        );
+        describe(
+          "the literals object returns the correct values for accessors when lower casing " +
+            "is used",
+          () => {
+            const ACCESSORS = [
+              ["apple", "apple"],
+              ["banana", "banana"],
+              ["blueberry", "blueberry"],
+              ["orange", "orange"],
+            ] as const satisfies [string, string][];
+            const Literals = enumeratedLiterals(
+              [
+                { accessor: "APPLE", value: "apple" },
+                { accessor: "BANANA", value: "banana" },
+                { accessor: "Blueberry", value: "blueberry" },
+                { accessor: "Orange", value: "orange" },
+              ] as const,
+              { accessorCase: "lower" },
+            );
+            test.each(ACCESSORS)("(accessor = %s)", (accessor, value) => {
+              expect(Literals[accessor]).toBe(value);
+            });
+          },
+        );
       },
     );
   });
   describe("the literals object properly formats raw accessors", () => {
-    it("properly removes unncecessary whitespace", () => {
+    describe("properly removes unncecessary whitespace", () => {
       const ACCESSORS = [
         ["ap_ple", "apple"],
         ["ba_n_ana", "banana"],
         ["blu_eber_r_y", "blueberry"],
         ["ora_nge", "orange"],
       ] as const satisfies [string, string][];
-
       const Literals = enumeratedLiterals(
         [
           { accessor: "ap  ple", value: "apple" },
@@ -91,15 +174,26 @@ describe("the literals object is properly attributed with accessors", () => {
       });
     });
   });
+
   describe("the literals object throws an error when accessors are invalid", () => {
     const INVALID_ACCESSORS = ["9foo", " foo bar ", "foo&bar"];
-
+    const INVALID_MODELS = [
+      [INVALID_ACCESSORS[0], "foo"],
+      [INVALID_ACCESSORS[1], "bar"],
+      [INVALID_ACCESSORS[2], "bat"],
+    ];
     describe("throws an error when the value maps to an invalid accessor", () => {
       test.each(INVALID_ACCESSORS)("(accessor = %s)", accessor => {
         expect(() => enumeratedLiterals([accessor] as const, {})).toThrow();
       });
     });
+    describe("throws an error when invalid accessors explicitly defined", () => {
+      test.each(INVALID_MODELS)("(accessor = %s)", (accessor, value) => {
+        expect(() => enumeratedLiterals([{ accessor, value }] as const, {})).toThrow();
+      });
+    });
   });
+
   describe("the literals object throws an error when accessors are not unique", () => {
     it("throws an error when two different values map to the same accessor", () => {
       expect(() => enumeratedLiterals(["foo bar", "foo-bar"] as const, {})).toThrow();

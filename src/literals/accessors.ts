@@ -185,8 +185,8 @@ export const toLiteralAccessor = <
 
   let accessor: string = validateAccessor(v);
   // Remove white space that is more than 1 characters long.
-  while (v.includes(" ".repeat(2))) {
-    accessor = v.replaceAll(" ".repeat(2), " ");
+  while (accessor.includes(" ".repeat(2))) {
+    accessor = accessor.replaceAll(" ".repeat(2), " ");
   }
 
   if (opts.accessorCase === "upper") {

@@ -8,7 +8,7 @@ import { withApplicationConfig } from "./src/__tests__/jest.config.base";
  * as either jest-*.config.ts or jest.config.ts.
  */
 export default withApplicationConfig(__dirname, [
-  "./src/__tests__/unit/jest.config.ts",
+  "./src/__tests__/unit/jest.config.unit.ts",
   "./src/__tests__/jest.config.eslint.ts",
   "./src/__tests__/jest.config.prettier.ts",
 ]);
