@@ -146,7 +146,7 @@ export const enumeratedLiterals = <L extends Literals, O extends EnumeratedLiter
       }
       return this.getModel(v as LiteralsValue<L>);
     },
-    schema: z.union(
+    zodSchema: z.union(
       values.map(v => z.literal(v)) as MoreThan2Array<z.ZodLiteral<LiteralsValues<L>[number]>>,
     ),
     throwInvalidValue(this: EnumeratedLiterals<L, O>, v: unknown, errorMessage?: string): never {
@@ -170,7 +170,7 @@ export const enumeratedLiterals = <L extends Literals, O extends EnumeratedLiter
       );
     },
     contains(this: EnumeratedLiterals<L, O>, v: unknown): v is LiteralsValue<L> {
-      return this.schema.safeParse(v).success;
+      return this.zodSchema.safeParse(v).success;
     },
     parse(this: EnumeratedLiterals<L, O>, v: unknown, errorMessage?: string): LiteralsValue<L> {
       this.assert(v, errorMessage);

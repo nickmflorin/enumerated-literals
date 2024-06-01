@@ -100,7 +100,7 @@ export type EnumeratedLiterals<
   readonly values: LiteralsValues<L>;
   readonly models: LiteralsModels<L>;
   readonly options: O;
-  readonly schema: z.ZodUnion<
+  readonly zodSchema: z.ZodUnion<
     readonly [z.ZodLiteral<LiteralsValues<L>[number]>, ...z.ZodLiteral<LiteralsValues<L>[number]>[]]
   >;
   readonly getAttributes: <N extends LiteralsModelAttributeName<L>>(
