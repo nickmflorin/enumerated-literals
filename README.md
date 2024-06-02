@@ -7,6 +7,8 @@ defining and manage constant strings in an application.
 npm install enumerated-literals
 ```
 
+### Basics
+
 At it's core, the `enumerated-literals` package provides a method, `enumeratedLiterals`, that can be
 used to define and group constant string literals in an `enum`-like fashion:
 
@@ -323,7 +325,7 @@ type will be strongly typed, such that the properties associated with the provid
 their constant representations:
 
 ```ts
-// Typed as { value: "apple"; description: "A red fruit"; color: "red"; label: "Apple"; }
+// { value: "apple"; description: "A red fruit"; color: "red"; label: "Apple"; }
 Fruits.getModel("apple");
 ```
 
@@ -346,7 +348,7 @@ Fruits.getModelSafe("cucumber", { strict: true }); // Throws Error, but compiles
 ```
 
 ```ts
-Fruits.getModelSafe("apple", { strict: false }); // Compiles, returns `string | null`.
+Fruits.getModelSafe("cucumber", { strict: false }); // Compiles, returns the model or null
 ```
 
 ##### Attribute Getters
@@ -376,7 +378,9 @@ Fruits.getAttributes("description");
 
 ### API
 
-#### Properties
+The following section describes the methods and properties on an `EnumeratedLiterals` instance.
+
+#### Instance Properties
 
 ##### `values` (_property_)
 
@@ -472,7 +476,7 @@ const MyFruitSchema = z.object({
 });
 ```
 
-#### Methods
+#### Instance Methods
 
 ##### `assert` (_method_)
 
@@ -553,14 +557,70 @@ function process(value: unknown) {
 
 ##### `getModel` (_method_)
 
+Returns the model associated with a specific constant string literal value on the
+`EnumeratedLiterals` instance. Throws an `Error` if the provided value is not a specific constant
+string literal on the `EnumeratedLiterals` instance - however, the method is typed such that the
+compiler will fail if you attempt to provide an invalid value.
+
 ```ts
 <V extends LiteralsValue<L>>(v: V): LiteralsModel<L, V>;
 ```
 
+###### Example
+
+```ts
+import { enumeratedLiterals } from "enumerated-literals";
+
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+
+// { value: "apple"; description: "A red fruit"; color: "red"; label: "Apple"; }
+Fruits.getModel("apple");
+```
+
 ##### `getModelSafe` (_method_)
+
+Returns the model associated with a specific constant string literal value on the
+`EnumeratedLiterals` instance if that provided value is in fact on the `EnumeratedLiterals`
+instance.
 
 ```ts
 <O extends GetModelSafeOptions>(value: unknown, opts: O): GetModelSafeRT<L, O>
+```
+
+In other words, this method does not assume that the provided value is in the set of constant string
+literals on the `EnumeratedLiterals` instance, but instead will either return `null` (if
+`options.strict` is `false` or not provided) or throw an `Error` (if `options.strict` is `true`) if
+the provided value is not in the set of constant string literals on the `EnumeratedLiterals`
+instance.
+
+###### Example
+
+```ts
+import { enumeratedLiterals } from "enumerated-literals";
+
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+
+const v: unknown = "cucumber";
+
+/*
+ | { value: "apple"; description: "A red fruit"; color: "red"; label: "Apple"; }
+ | { value: "banana"; description: "A yellow fruit"; color: "yellow"; label: "Banana"; }
+ | { value: "blueberry"; description: "A blue fruit"; color: "blue"; label: "Blueberry"; }
+ | { value: "orange"; description: "An orange fruit"; color: "orange"; label: "Orange"; }
+*/
+Fruits.getModelSafe(v, { strict: true });
+
+/*
+ | { value: "apple"; description: "A red fruit"; color: "red"; label: "Apple"; }
+ | { value: "banana"; description: "A yellow fruit"; color: "yellow"; label: "Banana"; }
+ | { value: "blueberry"; description: "A blue fruit"; color: "blue"; label: "Blueberry"; }
+ | { value: "orange"; description: "An orange fruit"; color: "orange"; label: "Orange"; }
+ | null
+*/
+Fruits.getModelSafe(v, { strict: false });
+
+// Same as above
+Fruits.getModelSafe(v, {});
 ```
 
 ##### `getAttribute` (_method_)

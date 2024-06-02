@@ -95,60 +95,36 @@ export type EnumeratedLiterals<
     attribute: N,
   ) => LiteralsAttributeValue<L, V, N>;
   readonly getModel: <V extends LiteralsValue<L>>(v: V) => LiteralsModel<L, V>;
-  readonly getModelSafe: GetModelSafe<L>;
   /**
-   * A method that returns the unknown value after an assertion has been applied guaranteeing that
-   * the provided value is in the set of constants defined by the enumerated literals instance,
-   * {@link EnumeratedLiteral}.
+   * Returns the model associated with a specific constant string literal value,
+   * {@link LiteralsValue<L>} on the {@link EnumeratedLiterals} instance if that provided value
+   * is in fact on the {@link EnumeratedLiterals} instance.
+   *
+   * In other words, this method does not assume that the provided value is in the set of constant
+   * string literals on the {@link EnumeratedLiterals} instance, but instead will either return
+   * `null` (if `options.strict` is `false` or not provided) or throw an {@link Error} (if
+   * `options.strict` is `true`) if the provided value is not in the set of constant string literals
+   * on the {@link EnumeratedLiterals} instance.
    *
    * @example
-   * const ValidSizes = enumeratedLiterals(["small", "medium", "large"] as const);
-   * type ValidSize = EnumeratedLiteralType<typeof ValidSizes>;
    *
-   * const MyComponent = ({ size, ...props }: { size: ValidSize, ... }): JSX.Element => {
-   *   return <></>
-   * }
+   * ```ts
+   * import { enumeratedLiterals } from "enumerated-literals";
    *
-   * const ParentComponent = ({ size, ...props }: { size: string, ... }): JSX.Element => {
-   *   // The `size` prop is now type-safe because if it is not a valid size, an error will be
-   *   // thrown.
-   *   return <MyComponent {...props} size={ValidSizes.parse(size)} />
-   * }
+   * const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+   *
+   * const v: unknown = "cucumber";
+   * Fruits.getModelSafe(v, { strict: true });
+   *
+   * Fruits.getModelSafe(v, { strict: false });
+   *
+   * // Same as above
+   * Fruits.getModelSafe(v, {});
    */
+  readonly getModelSafe: GetModelSafe<L>;
   readonly parse: (v: unknown, errorMessage?: string) => LiteralsValue<L>;
   readonly assert: EnumeratedLiteralsAssertion<L>;
-  /**
-   * A type guard that returns whether or not the provided value is in the set of constants included
-   * in the literals, {@link EnumeratedLiterals} and is thus of the type
-   * {@link EnumeratedLiteralType} that associated with the set of literals.
-   *
-   * @example
-   * const ValidSizes = enumeratedLiterals(["small", "medium", "large"] as const);
-   * type ValidSize = EnumeratedLiteralType<typeof ValidSizes>;
-   *
-   * const MyComponent = ({ size, ...props }: { size: ValidSize, ... }): JSX.Element => {
-   *   return <></>
-   * }
-   *
-   * const ParentComponent = ({ size, ...props }: { size: string, ... }): JSX.Element => {
-   *   if (ValidSizes.contains(size)) {
-   *     // The `size` prop is now type-safe and guaranteed to be of type ValidSize.
-   *     return <MyComponent {...props} size={size} />
-   *   }
-   *   return <></>
-   * }
-   */
   readonly contains: (v: unknown) => v is LiteralsValue<L>;
-  /**
-   * Returns a new enumerated literals instance, {@link EnumeratedLiterals}, that is formed from
-   * a provided subset of the constants associated with the original enumerated literals instance,
-   * {@link EnumeratedLiterals}.
-   *
-   * @example
-   * const Constants = enumeratedLiterals(["a", "b"] as const);
-   * // EnumeratedLiterals<readonly ["a"]>;
-   * const NewConstants = Constants.pick(["a", "d"] as const);
-   */
   readonly pick: <
     T extends readonly LiteralsValues<L>[number][],
     Ot extends EnumeratedLiteralsDynamicOptions<ExtractLiterals<L, T>>,
@@ -159,17 +135,6 @@ export type EnumeratedLiterals<
     ExtractLiterals<L, T>,
     OptionsWithNewSet<ExtractLiterals<L, T>, Ot, L, O>
   >;
-  /**
-   * Returns a new enumerated literals instance, {@link EnumeratedLiterals}, that is formed from
-   * a the constants associated with the original enumerated literals instance,
-   * {@link EnumeratedLiterals}, excluding the constants provided as a readonly array to the method,
-   * {@link T}.
-   *
-   * @example
-   * const Constants = enumeratedLiterals(["a", "b"] as const);
-   * // EnumeratedLiterals<readonly ["a"]>;
-   * const NewConstants = Constants.omit(["b"] as const);
-   */
   readonly omit: <
     T extends readonly LiteralsValues<L>[number][],
     Ot extends EnumeratedLiteralsDynamicOptions<ExcludeLiterals<L, T>>,
