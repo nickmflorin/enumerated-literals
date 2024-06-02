@@ -380,14 +380,72 @@ Fruits.getAttributes("description");
 
 ##### `values` (_property_)
 
+The constant string literal values on the `EnumeratedLiterals` instance.
+
 ```ts
 LiteralsValues<L>;
 ```
 
+###### Example
+
+```ts
+import { enumeratedLiterals } from "enumerated-literals";
+
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+Fruits.values; // readonly ["apple", "banana", "blueberry", "orange"]
+
+// or
+
+const Fruits = enumeratedLiterals(
+  [
+    { value: "apple", accessor: "Apple" },
+    { value: "banana", accessor: "Banana" },
+    { value: "blueberry", accessor: "Blueberry" },
+    { value: "orange", accessor: "Orange" },
+  ] as const,
+  {},
+);
+
+Fruits.values; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
+```
+
 ##### `models` (_property_)
+
+The `object`(s) associated with each `EnumeratedLiterals` value on the `EnumeratedLiterals`
+instance.
 
 ```ts
 LiteralsModels<L>;
+```
+
+###### Example
+
+```ts
+import { enumeratedLiterals } from "enumerated-literals";
+
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+// readonly [{ value: "apple" }, { value: "banana" }, { value: "blueberry" }, { value: "orange" }]
+Fruits.models;
+
+// or
+
+const Fruits = enumeratedLiterals(
+  [
+    { value: "apple", description: "A red fruit", color: "red", label: "Apple" },
+    { value: "banana", description: "A yellow fruit", color: "yellow", label: "Banana" },
+    { value: "blueberry", description: "A blue fruit", color: "blue", label: "Blueberry" },
+    { value: "orange", description: "An orange fruit", color: "orange", label: "Orange" },
+  ] as const,
+  {},
+);
+
+/* readonly [
+  { value: "apple"; description: "A red fruit"; color: "red"; label: "Apple"; },
+  { value: "banana"; description: "A yellow fruit"; color: "yellow"; label: "Banana"; },
+  { value: "blueberry"; description: "A blue fruit"; color: "blue"; label: "Blueberry"; },
+  { value: "orange"; description: "An orange fruit"; color: "orange"; label: "Orange"; },
+] */
+Fruits.models;
 ```
 
 ##### `zodSchema` (_property_)
@@ -422,7 +480,7 @@ A type assertion that throws an `Error` if the provided value is not in the set 
 literal values on the `EnumeratedLiterals` instance.
 
 ```ts
-<L extends Literals> = (value: unknown, errorMessage?: string): asserts value is LiteralsValue<L>;
+<L extends Literals>(value: unknown, errorMessage?: string): asserts value is LiteralsValue<L>;
 ```
 
 ###### Example
@@ -496,35 +554,111 @@ function process(value: unknown) {
 ##### `getModel` (_method_)
 
 ```ts
-enumeratedLiterals(..., {}).getModel;
+<V extends LiteralsValue<L>>(v: V): LiteralsModel<L, V>;
 ```
 
 ##### `getModelSafe` (_method_)
 
 ```ts
-enumeratedLiterals(..., {}).getModelSafe;
+<O extends GetModelSafeOptions>(value: unknown, opts: O): GetModelSafeRT<L, O>
 ```
 
 ##### `getAttribute` (_method_)
 
+Returns the value of an attribute, `N`, associated with a specific value on the `EnumeratedLiterals`
+instance.
+
 ```ts
-enumeratedLiterals(..., {}).getAttribute;
+<V extends LiteralsValue<L>, N extends LiteralsModelAttributeName<L>>(value: V, attribute: N): LiteralsAttributeValue<L, V, N>
+```
+
+###### Example
+
+```ts
+import { enumeratedLiterals } from "enumerated-literals";
+
+const Fruits = enumeratedLiterals(
+  [
+    { value: "apple", description: "A red fruit", color: "red", label: "Apple" },
+    { value: "banana", description: "A yellow fruit", color: "yellow", label: "Banana" },
+    { value: "blueberry", description: "A blue fruit", color: "blue", label: "Blueberry" },
+    { value: "orange", description: "An orange fruit", color: "orange", label: "Orange" },
+  ] as const,
+  {},
+);
+
+Fruits.getAttribute("apple", "description"); // Typed as "A red fruit"
 ```
 
 ##### `getAttributes` (_method_)
 
+Returns the values of a given attribute, `N`, associated with a all constant string literals on the
+`EnumeratedLiterals` instance.
+
 ```ts
-enumeratedLiterals(..., {}).getAttributes;
+<N extends LiteralsModelAttributeName<L>>(attribute: N): LiteralsAttributeValues<L, N>
+```
+
+###### Example
+
+```ts
+import { enumeratedLiterals } from "enumerated-literals";
+
+const Fruits = enumeratedLiterals(
+  [
+    { value: "apple", description: "A red fruit", color: "red", label: "Apple" },
+    { value: "banana", description: "A yellow fruit", color: "yellow", label: "Banana" },
+    { value: "blueberry", description: "A blue fruit", color: "blue", label: "Blueberry" },
+    { value: "orange", description: "An orange fruit", color: "orange", label: "Orange" },
+  ] as const,
+  {},
+);
+
+Fruits.getAttributes("label"); // readonly ["Apple", "Banana", "Blueberry", "Orange"]
 ```
 
 ##### `pick` (_method_)
 
+Returns a new `EnumeratedLiterals` instance that consists of just the values that are provided to
+the method.
+
 ```ts
-enumeratedLiterals(..., {}).pick;
+<T extends readonly LiteralsValues<L>[number][], Ot extends EnumeratedLiteralsDynamicOptions<ExtractLiterals<L, T>>>(vs: T, opts?: Ot): EnumeratedLiterals<
+  ExtractLiterals<L, T>,
+  OptionsWithNewSet<ExtractLiterals<L, T>, Ot, L, O>
+>
+```
+
+###### Example
+
+```ts
+import { enumeratedLiterals } from "enumerated-literals";
+
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+const RoundFruits = Fruits.pick(["apple", "orange"] as const);
+
+RoundFruits.values; // readonly ["apple", "orange"]
 ```
 
 ##### `omit` (_method_)
 
+Returns a new `EnumeratedLiterals` instance that consists of just the values on the instance
+exluding those that are provided to the method.
+
 ```ts
-enumeratedLiterals(..., {}).omit;
+<T extends readonly LiteralsValues<L>[number][], Ot extends EnumeratedLiteralsDynamicOptions<ExcludeLiterals<L, T>>>(vs: T, opts?: Ot): EnumeratedLiterals<
+  ExcludeLiterals<L, T>,
+  OptionsWithNewSet<ExcludeLiterals<L, T>, Ot, L, O>
+>
+```
+
+###### Example
+
+```ts
+import { enumeratedLiterals } from "enumerated-literals";
+
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+const RoundFruits = Fruits.omit(["banana", "blueberry"] as const);
+
+RoundFruits.values; // readonly ["apple", "orange"]
 ```
