@@ -42,7 +42,12 @@
   "keywords": [
     "literals",
     "enum",
-    "constants"
+    "constants",
+    "template-string-literals",
+    "typescript",
+    "type-safe-enum-pattern",
+    "enums",
+    "type-safety"
   ],
   "author": "nickmflorin@gmail.com",
   "license": "ISC"
