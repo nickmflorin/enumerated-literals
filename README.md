@@ -1,7 +1,7 @@
 # Enumerated Literals
 
 The `enumerated-literals` package provides a strongly-typed, type-safe and convenient pattern for
-defining and manage constant strings in an application.
+defining, organizing and managing constant string values in an application.
 
 ```bash
 npm install enumerated-literals
