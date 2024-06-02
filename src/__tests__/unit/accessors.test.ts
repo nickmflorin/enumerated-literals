@@ -158,10 +158,10 @@ describe("the literals object is properly attributed with accessors", () => {
       ] as const satisfies [string, string][];
       const Literals = enumeratedLiterals(
         [
-          { accessor: "ap  ple", value: "apple" },
+          { accessor: " ap  ple", value: "apple" },
           { accessor: "ba n   ana", value: "banana" },
           { accessor: "blu   eber r  y", value: "blueberry" },
-          { accessor: "ora  nge", value: "orange" },
+          { accessor: "ora  nge  ", value: "orange" },
         ] as const,
         {},
       );
@@ -172,11 +172,10 @@ describe("the literals object is properly attributed with accessors", () => {
   });
 
   describe("the literals object throws an error when accessors are invalid", () => {
-    const INVALID_ACCESSORS = ["9foo", " foo bar ", "foo&bar"];
+    const INVALID_ACCESSORS = ["foo *", "foo&bar"];
     const INVALID_MODELS = [
       [INVALID_ACCESSORS[0], "foo"],
       [INVALID_ACCESSORS[1], "bar"],
-      [INVALID_ACCESSORS[2], "bat"],
     ];
     describe("throws an error when the value maps to an invalid accessor", () => {
       test.each(INVALID_ACCESSORS)("(accessor = %s)", accessor => {

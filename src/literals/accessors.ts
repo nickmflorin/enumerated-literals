@@ -13,6 +13,12 @@ export type RemoveUnnecessaryWhiteSpace<S extends string> =
     ? RemoveUnnecessaryWhiteSpace<`${L} ${R}`>
     : S;
 
+export type Trim<S extends string> = S extends ` ${infer R extends string}`
+  ? Trim<R>
+  : S extends `${infer L extends string} `
+    ? Trim<L>
+    : S;
+
 export type ParseAccessorCase<
   L extends Literals,
   O extends EnumeratedLiteralsOptions<L>,
@@ -107,7 +113,7 @@ export type LiteralsAccessor<
   O extends EnumeratedLiteralsOptions<L>,
 > = V extends string
   ? FormatAccessorSpaces<
-      FormatAccessorHyphens<FormatAccessorCase<RemoveUnnecessaryWhiteSpace<V>, L, O>, L, O>,
+      FormatAccessorHyphens<FormatAccessorCase<RemoveUnnecessaryWhiteSpace<Trim<V>>, L, O>, L, O>,
       L,
       O
     >
@@ -143,13 +149,9 @@ export type EnumeratedLiteralsAccessors<
     ? EnumeratedLiteralsBaseModelArrayAccessors<L, O>
     : never;
 
-const AccessorRegex = /^[A-Za-z]+[A-Za-z0-9-_\s]*$/;
+const AccessorRegex = /^[A-Za-z0-9-_\s]*$/;
 
 const InvalidAccessorConditions: { check: (v: string) => boolean; message: string }[] = [
-  {
-    check: v => v.trim().length !== v.length,
-    message: "The accessor must not contain leading or trailing whitespace.",
-  },
   {
     check: v => v.length === 0,
     message: "The accessor must not be an empty string.",
@@ -157,15 +159,16 @@ const InvalidAccessorConditions: { check: (v: string) => boolean; message: strin
   {
     check: v => !AccessorRegex.test(v),
     message:
-      "The accessor must only contain alphanumeric characters, hyphens, underscores, " +
-      "and spaces, and it must begin with a alpha character.",
+      "The accessor is only allowed to contain alphanumeric characters, hyphens, underscores, " +
+      "and spaces.",
   },
 ];
 
 export const validateAccessor = <T extends string>(value: T): T => {
   for (const { check, message } of InvalidAccessorConditions) {
     if (check(value)) {
-      throw new Error(message);
+      const msg = `Invalid accessor: '${value}': ${message}`;
+      throw new Error(msg);
     }
   }
   return value;
@@ -192,7 +195,8 @@ export const toLiteralAccessor = <
 ): LiteralsAccessor<V, L, O> => {
   const opts = { ...getDefaultLiteralsAccessorOptions(literals), ...removeUndefined(options) };
 
-  let accessor: string = validateAccessor(v);
+  let accessor: string = validateAccessor(v.trim());
+
   // Remove white space that is more than 1 characters long.
   while (accessor.includes(" ".repeat(2))) {
     accessor = accessor.replaceAll(" ".repeat(2), " ");
