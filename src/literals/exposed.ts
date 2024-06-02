@@ -1,5 +1,3 @@
-import { type z } from "zod";
-
 import { type HumanizeListOptions } from "~/formatters";
 
 import { type EnumeratedLiteralsAccessors } from "./accessors";
@@ -89,9 +87,6 @@ export type EnumeratedLiterals<
   readonly values: LiteralsValues<L>;
   readonly models: LiteralsModels<L>;
   readonly options: O;
-  readonly zodSchema: z.ZodUnion<
-    readonly [z.ZodLiteral<LiteralsValues<L>[number]>, ...z.ZodLiteral<LiteralsValues<L>[number]>[]]
-  >;
   readonly humanize: (options?: HumanizeListOptions<string>) => string;
   readonly getAttributes: <N extends LiteralsModelAttributeName<L>>(
     attribute: N,

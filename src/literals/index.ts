@@ -1,5 +1,3 @@
-import { z } from "zod";
-
 import { humanizeList } from "~/formatters";
 
 import { parseAccessors } from "./accessors";
@@ -33,8 +31,6 @@ export {
   type EnumeratedLiteralsType,
   type EnumeratedLiteralsModel,
 } from "./exposed";
-
-type MoreThan2Array<V> = [V, V, ...V[]];
 
 /**
  * A generic type that results in a type referred to internally as an "EnumeratedLiteralMap", which
@@ -133,9 +129,6 @@ export const enumeratedLiterals = <L extends Literals, O extends EnumeratedLiter
       }
       return this.getModel(v as LiteralsValue<L>);
     },
-    zodSchema: z.union(
-      values.map(v => z.literal(v)) as MoreThan2Array<z.ZodLiteral<LiteralsValues<L>[number]>>,
-    ),
     throwInvalidValue(this: EnumeratedLiterals<L, O>, v: unknown, errorMessage?: string): never {
       if (errorMessage === undefined && this.options.invalidValueErrorMessage !== undefined) {
         throw new Error(this.options.invalidValueErrorMessage(this.values, v));
@@ -153,7 +146,7 @@ export const enumeratedLiterals = <L extends Literals, O extends EnumeratedLiter
       throw new Error(`The value ${v} is not valid, it must be one of ${humanizedValues}.`);
     },
     contains(this: EnumeratedLiterals<L, O>, v: unknown): v is LiteralsValue<L> {
-      return this.zodSchema.safeParse(v).success;
+      return typeof v === "string" && this.values.includes(v);
     },
     parse(this: EnumeratedLiterals<L, O>, v: unknown, errorMessage?: string): LiteralsValue<L> {
       this.assert(v, errorMessage);

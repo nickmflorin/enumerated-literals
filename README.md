@@ -472,30 +472,6 @@ const Fruits = enumeratedLiterals(
 Fruits.models;
 ```
 
-##### `zodSchema` (_property_)
-
-Returns a `zod.ZodUnion` that can be used to validate a value when parsing with `zod`.
-
-```ts
-z.ZodUnion<
-  readonly [z.ZodLiteral<LiteralsValues<L>[number]>, ...z.ZodLiteral<LiteralsValues<L>[number]>[]]
->;
-```
-
-###### Example
-
-```ts
-import { enumeratedLiterals } from "enumerated-literals";
-
-const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
-type Fruit = EnumeratedLiteralType<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
-
-const MyFruitSchema = z.object({
-  name: Fruits.schema,
-  id: z.string(),
-});
-```
-
 #### Instance Methods
 
 ##### `assert` (_method_)
