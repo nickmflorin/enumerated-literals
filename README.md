@@ -7,10 +7,21 @@ defining and manage constant strings in an application.
 npm install enumerated-literals
 ```
 
-### Basics
+## Basics
 
 At it's core, the `enumerated-literals` package provides a method, `enumeratedLiterals`, that can be
 used to define and group constant string literals in an `enum`-like fashion:
+
+```ts
+enumeratedLiterals<L extends Literals, O extends EnumeratedLiteralsOptions<L>>(literals: L, options: O): EnumeratedLiterals<L, O>
+```
+
+The first argument to the `enumeratedLiterals` method, `L` (or `Literals`), should be a `const`
+(`readonly`) array of `string` values or `object` values that contain a `value` key. The second
+argument provided to the `enumeratedLiterals` method, `O` (or `EnumeratedLiteralsOptions<L>`),
+should be an `object` type that contains the options for the instance.
+
+###### Example
 
 ```ts
 import { enumeratedLiterals } from "enumerated-literals";
@@ -29,141 +40,50 @@ doSomethingWithFruit("apple");
 
 The following terms will be referenced throughout this documentation:
 
-##### The `EnumeratedLiterals` Instance:
+1. **The `EnumeratedLiterals` Instance**:
 
-The `object` that is created and returned by the `enumeratedLiterals` method (e.g. `Fruits`).
+   The `object` that is created and returned by the `enumeratedLiterals` method (e.g. `Fruits`).
 
-```ts
-const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
-```
+   ```ts
+   const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+   ```
 
-##### The `EnumeratedLiterals` Values
+2. **The `EnumeratedLiterals` Values**:
 
-The constant string literal values that the `EnumeratedLiterals` instance contains (e.g. `"apple"`,
-`"banana"`, `"blueberry"`, `"orange"`).
+   The constant string literal values that the `EnumeratedLiterals` instance contains (e.g.
+   `"apple"`, `"banana"`, `"blueberry"`, `"orange"`).
 
-```ts
-Fruits.values; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
-```
+   ```ts
+   Fruits.values; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
+   ```
 
-##### The `EnumeratedLiterals` Models
+3. **The `EnumeratedLiterals` Models**:
 
-The `object`(s) associated with each `EnumeratedLiterals` value on the `EnumeratedLiterals`
-instance. Each object contains the relevant `EnumeratedLiterals` value, indexed by the `value` key,
-along with additional key-value pairs that are associated with each value when provided on
-instantiation of the instance: `"banana"`, `"blueberry"`, `"orange"`).
+   The `object`(s) associated with each `EnumeratedLiterals` value on the `EnumeratedLiterals`
+   instance. Each object contains the relevant `EnumeratedLiterals` value, indexed by the `value`
+   key, along with additional key-value pairs that are associated with each value when provided on
+   instantiation of the instance: `"banana"`, `"blueberry"`, `"orange"`).
 
-```ts
-// Typed as readonly [ { value: "apple" }, { value: "banana" }, { value: "blueberry" }, { value: "orange" }]
-Fruits.models;
-```
+   ```ts
+   // Typed as readonly [ { value: "apple" }, { value: "banana" }, { value: "blueberry" }, { value: "orange" }]
+   Fruits.models;
+   ```
 
-##### The `EnumeratedLiterals` **Accessors**
+4. **The `EnumeratedLiterals` Accessors**:
 
-The properties of the `EnumeratedLiterals` instance that are used to access the `EnumeratedLiterals`
-values on the instance (e.g. `APPLE` or `BANANA`).
+   The properties of the `EnumeratedLiterals` instance that are used to access the
+   `EnumeratedLiterals` values on the instance (e.g. `APPLE` or `BANANA`).
 
-```ts
-Fruits.APPLE; // Typed as "apple"
-```
+   ```ts
+   Fruits.APPLE; // Typed as "apple"
+   ```
 
-### Motivation
-
-The motivation for the development of this package was to provide a more convenient way to define
-and manage constant string definitions in an application that blends the benefits of an `enum`
-object with that of a `string` literal, while also attempting to eliminate the drawbacks of each.
-
-#### The `enum` Object
-
-Consider the following `enum` object:
-
-```ts
-enum Fruits {
-  APPLE = "apple",
-  BANANA = "banana",
-  BLUEBERRY = "blueberry",
-  ORANGE = "orange",
-}
-```
-
-The values of the `enum` can be accessed as `Fruits.APPLE`, `Fruits.BANANA`, etc. This is
-convenient, and reduces the likelihood of bugs by allowing potentially more complex strings to be
-accessed by the members of the `enum` object.
-
-For instance, in the following, the likelihood of introducing a bug due to the mispelling of a URL
-is reduced when we consistently reference the URL for Google or YouTube in the application as
-`ApplicationUrls.GOOGLE` and `ApplicationUrls.YOUTUBE` respectively, rather than as "magic strings",
-like `"https://www.google.com"` or `"https://www.youtube.com"`:
-
-```ts
-enum ApplicationUrls {
-  GOOGLE = "https://www.google.com",
-  YOUTUBE = "https://www.youtube.com",
-}
-```
-
-However, the `enum` object has the following drawbacks:
-
-1.  The values of the `Fruits` `enum` object are not treated as string literals. For instance, the
-    following code will not compile:
-
-    ```ts
-    function getFruitColor(fruit: Fruit): string {
-      ...
-    }
-
-    const appleColor = getFruitColor("apple")
-    ```
-
-    Sometimes this is desirable behavior, but other times it is not.
-
-2.  Associating values of the `Fruits` `enum` object with other constant values and/or definitions
-    requires the addition of additional types, data structures, functions and/or definitions:
-
-    ```ts
-    const FruitColors: { [key in Fruits]: string } = {
-      [Fruits.APPLE]: "red",
-      [Fruits.BANANA]: "yellow",
-      [Fruits.BLUEBERRY]: "blue",
-      [Fruits.ORANGE]: "orange",
-    };
-    ```
-
-#### String Literals
-
-Consider the following pattern commonly used to define string literals in an application:
-
-```ts
-const Fruits = ["apple", "banana", "blueberry", "orange"] as const;
-type Fruit = (typeof Fruits)[number];
-```
-
-Defining constant string literals in this manner is slightly more flexible than an `enum` object,
-because a string literal (e.g. `"apple"`) satisfies the `Fruit` type. For example, the following
-code will compile:
-
-```ts
-function getFruitColor(fruit: Fruit): string {
-  ...
-}
-
-const appleColor = getFruitColor("apple")
-```
-
-However, defining constant string literals in this manner has the following drawbacks:
-
-1.  The values represented by the `Fruit` type do not have `enum`-like accessors, like
-    `Fruits.APPLE`, or `Fruits.BANANA`.
-2.  As with the `enum` object, associating the values represented by the `Fruit` type with other
-    constant values and/or definitions requires the addition of additional types, data structures
-    and/or definitions.
-
-### Usage
+## Usage
 
 The following describes how the `enumerated-literals` package can be used and the various features
 it offers.
 
-#### Basic Usage
+### Basic Usage
 
 In its most basic form, an `EnumeratedLiterals` instance can be created as follows:
 
@@ -252,6 +172,8 @@ function process(value: unknown) {
   processFruit(f);
 }
 ```
+
+### Advanced Usage
 
 #### `EnumeratedLiterals` Model
 
@@ -376,7 +298,105 @@ instance:
 Fruits.getAttributes("description");
 ```
 
-### API
+#### Configuration Options
+
+Additional, optional options can be provided to the `enumeratedLiterals` method in order to control
+error messages and/or the formatting of accessors on the `EnumeratedLiterals` instance.
+
+The optional options that can be provided to the `enumeratedLiterals` method are as follows:
+
+1. **`invalidValueErrorMessage`** (`EnumeratedLiteralsInvalidValueErrorMessage`):
+
+   A function that can be used to format the error message for the `Error` that is thrown when an
+   invalid value is encountered by the `EnumeratedLiterals` instance.
+
+   ###### Example
+
+   ```ts
+   const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {
+     invalidValueErrorMessage: (values, value) =>
+       `The value '${value}' is not in the set of fruits: ${values.join(", ")}!`,
+   });
+   ```
+
+2. **`accessorSpaceReplacement`** (`AccessorSpaceReplacement` or `"_" | "-" | ""`)
+
+   The `string` value that will be used to replace single white-space characters when the accessors
+   are either auto-generated based on the constant string literal values on the `EnumeratedLiterals`
+   instance or when white-space characters are encountered in the `accessor` property of a given
+   `object` provided to the `enumeratedLiterals` method:
+
+   ###### Example
+
+   ```ts
+   const Fruits = enumeratedLiterals(["red apple", "yellow banana"] as const, {
+     accessorSpaceReplacement: "-",
+   });
+
+   Fruits["RED-APPLE"]; // "red apple"
+   Fruits["YELLOW-BANANA"]; // "yellow banana"
+   ```
+
+   Note that multiple white-space characters encountered in the middle of a value or accessor will
+   be replaced with single white-space characters:
+
+   ###### Example
+
+   ```ts
+   const Fruits = enumeratedLiterals(["red    apple"] as const, {
+     accessorSpaceReplacement: "_",
+   });
+
+   Fruits.RED_APPLE; // "red    apple"
+   ```
+
+   Default: `"_"`
+
+3. **`accessorHyphenReplacement`** (`AccessorHyphenReplacement` or `"_" | "" | null`)
+
+   The `string` value that will be used to replace hyphens (`"-"`) when the accessors are either
+   auto-generated based on the constant string literal values on the `EnumeratedLiterals` instance
+   or when hyphen characters are encountered in the `accessor` property of a given `object` provided
+   to the `enumeratedLiterals` method:
+
+   ###### Example
+
+   ```ts
+   const Fruits = enumeratedLiterals(["red-apple"] as const, {
+     accessorHyphenReplacement: "_",
+   });
+
+   Fruits.RED_APPLE; // "red-apple"
+   ```
+
+   Note that a `null` value means that the hyphens will not be replaced but will be left in-tact.
+
+   Default: Either `"_"` or `null`, depending on whether or not the values provided to the
+   `enumeratedLiterals` method are provided as an array of `object`(s) with their own `accessor`
+   properties, or a `readonly` array of strings.
+
+4. **`accessorCase`** (`"lower" | "upper" | null`)
+
+   Whether the accessors should be formatted as lowercase strings, uppercase strings, or neither
+   (`null`), when the accessors are either auto-generated based on the constant string literal
+   values on the `EnumeratedLiterals` instance or when hyphen characters are encountered in the
+   `accessor` property of a given `object` provided to the `enumeratedLiterals` method:
+
+   ###### Example
+
+   ```ts
+   const Fruits = enumeratedLiterals(["RED-apple"] as const, {
+     accessorCase: "lower",
+   });
+
+   Fruits.red_apple; // "RED-apple"
+   ```
+
+   Default: Either `"upper"` or `null`, depending on whether or not the values provided to the
+   `enumeratedLiterals` method are provided as an array of `object`(s) with their own `accessor`
+   properties, or a `readonly` array of strings.
+
+## API
 
 The following section describes the methods and properties on an `EnumeratedLiterals` instance.
 
@@ -722,3 +742,134 @@ const RoundFruits = Fruits.omit(["banana", "blueberry"] as const);
 
 RoundFruits.values; // readonly ["apple", "orange"]
 ```
+
+##### `humanize` (_method_)
+
+Returns a human readable string representing the constant string literal values associated with the
+`EnumeratedLiterals` instance.
+
+```ts
+(options?: HumanizeListOptions<string>): string;
+```
+
+###### Example
+
+```ts
+import { enumeratedLiterals } from "enumerated-literals";
+
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+
+// "apple, banana, blueberry, or orange"
+Fruits.humanize({ conjunction: "or" });
+```
+
+##### `throwInvalidValue` (_method_)
+
+Throws an `Error` with a message that is generated based on optionally provided options to the
+`EnumeratedLiterals` instance on instantiation and/or the constant string literal values that are
+associated with the instance.
+
+```ts
+(v: unknown, errorMessage?: string): never;
+```
+
+###### Example
+
+```ts
+import { enumeratedLiterals } from "enumerated-literals";
+
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+
+Fruits.throwInvalidValue("cucumber"); // throws a descriptive Error
+```
+
+## Background & Motivation
+
+The motivation for the development of this package was to provide a more convenient way to define
+and manage constant string definitions in an application that blends the benefits of an `enum`
+object with that of a `string` literal, while also attempting to eliminate the drawbacks of each.
+
+#### The `enum` Object
+
+Consider the following `enum` object:
+
+```ts
+enum Fruits {
+  APPLE = "apple",
+  BANANA = "banana",
+  BLUEBERRY = "blueberry",
+  ORANGE = "orange",
+}
+```
+
+The values of the `enum` can be accessed as `Fruits.APPLE`, `Fruits.BANANA`, etc. This is
+convenient, and reduces the likelihood of bugs by allowing potentially more complex strings to be
+accessed by the members of the `enum` object.
+
+For instance, in the following, the likelihood of introducing a bug due to the mispelling of a URL
+is reduced when we consistently reference the URL for Google or YouTube in the application as
+`ApplicationUrls.GOOGLE` and `ApplicationUrls.YOUTUBE` respectively, rather than as "magic strings",
+like `"https://www.google.com"` or `"https://www.youtube.com"`:
+
+```ts
+enum ApplicationUrls {
+  GOOGLE = "https://www.google.com",
+  YOUTUBE = "https://www.youtube.com",
+}
+```
+
+However, the `enum` object has the following drawbacks:
+
+1.  The values of the `Fruits` `enum` object are not treated as string literals. For instance, the
+    following code will not compile:
+
+    ```ts
+    function getFruitColor(fruit: Fruit): string {
+      ...
+    }
+
+    const appleColor = getFruitColor("apple")
+    ```
+
+    Sometimes this is desirable behavior, but other times it is not.
+
+2.  Associating values of the `Fruits` `enum` object with other constant values and/or definitions
+    requires the addition of additional types, data structures, functions and/or definitions:
+
+    ```ts
+    const FruitColors: { [key in Fruits]: string } = {
+      [Fruits.APPLE]: "red",
+      [Fruits.BANANA]: "yellow",
+      [Fruits.BLUEBERRY]: "blue",
+      [Fruits.ORANGE]: "orange",
+    };
+    ```
+
+#### String Literals
+
+Consider the following pattern commonly used to define string literals in an application:
+
+```ts
+const Fruits = ["apple", "banana", "blueberry", "orange"] as const;
+type Fruit = (typeof Fruits)[number];
+```
+
+Defining constant string literals in this manner is slightly more flexible than an `enum` object,
+because a string literal (e.g. `"apple"`) satisfies the `Fruit` type. For example, the following
+code will compile:
+
+```ts
+function getFruitColor(fruit: Fruit): string {
+  ...
+}
+
+const appleColor = getFruitColor("apple")
+```
+
+However, defining constant string literals in this manner has the following drawbacks:
+
+1.  The values represented by the `Fruit` type do not have `enum`-like accessors, like
+    `Fruits.APPLE`, or `Fruits.BANANA`.
+2.  As with the `enum` object, associating the values represented by the `Fruit` type with other
+    constant values and/or definitions requires the addition of additional types, data structures
+    and/or definitions.

@@ -1,6 +1,6 @@
-type HumanizeListIteree = string | number;
+export type HumanizeListIteree = string | number;
 
-type HumanizeListOptions<T extends HumanizeListIteree> = {
+export type HumanizeListOptions<T extends HumanizeListIteree> = {
   readonly conjunction?: "and" | "or";
   readonly oxfordComma?: boolean;
   readonly delimiter?: string;

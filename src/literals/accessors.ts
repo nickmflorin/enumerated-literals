@@ -17,11 +17,9 @@ export type ParseAccessorCase<
   L extends Literals,
   O extends EnumeratedLiteralsOptions<L>,
 > = O extends {
-  accessorCase: infer S;
+  accessorCase: infer S extends AccessorCase;
 }
-  ? S extends AccessorCase
-    ? S
-    : never
+  ? S
   : DefaultAccessorOptions<L>["accessorCase"];
 
 export type FormatAccessorCase<

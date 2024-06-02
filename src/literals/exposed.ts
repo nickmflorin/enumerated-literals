@@ -1,5 +1,7 @@
 import { type z } from "zod";
 
+import { type HumanizeListOptions } from "~/formatters";
+
 import { type EnumeratedLiteralsAccessors } from "./accessors";
 import {
   type Literals,
@@ -70,6 +72,8 @@ export type EnumeratedLiteralsModel<L> =
     ? LiteralsModel<Ll, LiteralsValue<Ll>>
     : never;
 
+export type EnumeratedLiteralsProvidedForm = "models" | "values";
+
 /**
  * A generic type that represents the return of the {@link enumeratedLiterals} method.
  *
@@ -81,12 +85,14 @@ export type EnumeratedLiterals<
   L extends Literals,
   O extends EnumeratedLiteralsOptions<L>,
 > = EnumeratedLiteralsAccessors<L, O> & {
+  readonly __provided_form__: EnumeratedLiteralsProvidedForm;
   readonly values: LiteralsValues<L>;
   readonly models: LiteralsModels<L>;
   readonly options: O;
   readonly zodSchema: z.ZodUnion<
     readonly [z.ZodLiteral<LiteralsValues<L>[number]>, ...z.ZodLiteral<LiteralsValues<L>[number]>[]]
   >;
+  readonly humanize: (options?: HumanizeListOptions<string>) => string;
   readonly getAttributes: <N extends LiteralsModelAttributeName<L>>(
     attribute: N,
   ) => LiteralsAttributeValues<L, N>;
@@ -130,7 +136,7 @@ export type EnumeratedLiterals<
     Ot extends EnumeratedLiteralsDynamicOptions<ExtractLiterals<L, T>>,
   >(
     vs: T,
-    opts?: Ot,
+    opts: Ot,
   ) => EnumeratedLiterals<
     ExtractLiterals<L, T>,
     OptionsWithNewSet<ExtractLiterals<L, T>, Ot, L, O>
@@ -140,7 +146,7 @@ export type EnumeratedLiterals<
     Ot extends EnumeratedLiteralsDynamicOptions<ExcludeLiterals<L, T>>,
   >(
     vs: T,
-    opts?: Ot,
+    opts: Ot,
   ) => EnumeratedLiterals<
     ExcludeLiterals<L, T>,
     OptionsWithNewSet<ExcludeLiterals<L, T>, Ot, L, O>

@@ -53,7 +53,7 @@ export const getDefaultLiteralsAccessorOptions = <L extends Literals>(
   } else if (literalsAreArray(literals)) {
     return DEFAULT_ACCESSOR_ARRAY_OPTIONS as DefaultAccessorOptions<L>;
   }
-  throw new Error("");
+  throw new Error("Unreachable code path!");
 };
 
 export type EnumeratedLiteralsInvalidValueErrorMessage<L extends Literals> = (
@@ -105,5 +105,10 @@ export type OptionsWithNewSet<
   O extends EnumeratedLiteralsDynamicOptions<L>,
   LOld extends Literals,
   OOld extends EnumeratedLiteralsOptions<LOld>,
-> = Pick<OOld, "accessorCase" | "accessorHyphenReplacement" | "accessorSpaceReplacement"> &
-  Pick<O, "invalidValueErrorMessage">;
+> = {
+  [key in keyof O | keyof OOld]: key extends EnumeratedLiteralsStaticOption
+    ? OOld[key]
+    : key extends keyof O
+      ? O[key]
+      : never;
+};
