@@ -2,8 +2,12 @@
   "name": "enumerated-literals",
   "version": "1.1.0",
   "description": "The `enumerated-literals` package provides a strongly-typed, type-safe and convenient pattern for defining and manage constant strings in an application.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.mjs",
+  "files": [
+      "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/nickmflorin/enumerated-literals.git"
@@ -30,11 +34,12 @@
     "prettier-linter-helpers": "^1.0.0",
     "ts-jest": "^29.1.4",
     "ts-node": "^10.9.2",
+    "tsup": "^8.0.2",
     "typescript": "^5.4.5",
     "utility-types": "^3.11.0"
   },
   "scripts": {
-    "build": "npm run test:ci && npm run tsc",
+    "build": "npm run test:ci && tsup",
     "test": "jest --detectOpenHandles --forceExit --silent=false",
     "test:ci": "jest",
     "tsc": "tsc --project ./tsconfig.json"
