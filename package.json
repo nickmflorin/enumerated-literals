@@ -48,11 +48,16 @@
     "literals",
     "enum",
     "constants",
+    "template literals",
     "template-string-literals",
     "typescript",
     "type-safe-enum-pattern",
     "enums",
-    "type-safety"
+    "type-safety",
+    "string literals",
+    "string-literals",
+    "string literal",
+    "string-literal"
   ],
   "author": "nickmflorin@gmail.com",
   "license": "ISC"
