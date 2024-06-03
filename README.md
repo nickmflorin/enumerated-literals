@@ -23,6 +23,21 @@ The first argument to the `enumeratedLiterals` method, `L` (or `Literals`), shou
 method, `O` (or `EnumeratedLiteralsOptions<L>`), should be an `object` type that contains the
 options for the instance (see [Configuration Options](#configuration-options)).
 
+###### Example
+
+```ts
+import { enumeratedLiterals } from "enumerated-literals";
+
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+type Fruit = EnumeratedLiteralType<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
+
+Fruits.APPLE; // Typed as "apple"
+Fruits.BANANA; // Typed as "banana"
+
+const doSomethingWithFruit = (fruit: Fruit): void;
+doSomethingWithFruit("apple");
+```
+
 ### Why Not `enum`(s)?
 
 The primary motivation for the `enumerated-literals` package was the fact that constant string
@@ -53,21 +68,6 @@ Additionally, the `EnumeratedLiterals` instance offers built-in type-checking me
 typed properties, which provide a more convenient and organized way of making assertions and
 type-checking values related to the constant string literals the instance is associated with (see
 [Built-In Type Checking](#built-in-type-checking)).
-
-###### Example
-
-```ts
-import { enumeratedLiterals } from "enumerated-literals";
-
-const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
-type Fruit = EnumeratedLiteralType<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
-
-Fruits.APPLE; // Typed as "apple"
-Fruits.BANANA; // Typed as "banana"
-
-const doSomethingWithFruit = (fruit: Fruit): void;
-doSomethingWithFruit("apple");
-```
 
 ## Terminology
 
@@ -791,94 +791,3 @@ const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as 
 
 Fruits.throwInvalidValue("cucumber"); // throws a descriptive Error
 ```
-
-## Background & Motivation
-
-The motivation for the development of this package was to provide a more convenient way to define
-and manage constant string definitions in an application that blends the benefits of an `enum`
-object with that of a `string` literal, while also attempting to eliminate the drawbacks of each.
-
-#### The `enum` Object
-
-Consider the following `enum` object:
-
-```ts
-enum Fruits {
-  APPLE = "apple",
-  BANANA = "banana",
-  BLUEBERRY = "blueberry",
-  ORANGE = "orange",
-}
-```
-
-The values of the `enum` can be accessed as `Fruits.APPLE`, `Fruits.BANANA`, etc. This is
-convenient, and reduces the likelihood of bugs by allowing potentially more complex strings to be
-accessed by the members of the `enum` object.
-
-For instance, in the following, the likelihood of introducing a bug due to the mispelling of a URL
-is reduced when we consistently reference the URL for Google or YouTube in the application as
-`ApplicationUrls.GOOGLE` and `ApplicationUrls.YOUTUBE` respectively, rather than as "magic strings",
-like `"https://www.google.com"` or `"https://www.youtube.com"`:
-
-```ts
-enum ApplicationUrls {
-  GOOGLE = "https://www.google.com",
-  YOUTUBE = "https://www.youtube.com",
-}
-```
-
-However, the `enum` object has the following drawbacks:
-
-1.  The values of the `Fruits` `enum` object are not treated as string literals. For instance, the
-    following code will not compile:
-
-    ```ts
-    function getFruitColor(fruit: Fruit): string {
-      ...
-    }
-
-    const appleColor = getFruitColor("apple")
-    ```
-
-    Sometimes this is desirable behavior, but other times it is not.
-
-2.  Associating values of the `Fruits` `enum` object with other constant values and/or definitions
-    requires the addition of additional types, data structures, functions and/or definitions:
-
-    ```ts
-    const FruitColors: { [key in Fruits]: string } = {
-      [Fruits.APPLE]: "red",
-      [Fruits.BANANA]: "yellow",
-      [Fruits.BLUEBERRY]: "blue",
-      [Fruits.ORANGE]: "orange",
-    };
-    ```
-
-#### String Literals
-
-Consider the following pattern commonly used to define string literals in an application:
-
-```ts
-const Fruits = ["apple", "banana", "blueberry", "orange"] as const;
-type Fruit = (typeof Fruits)[number];
-```
-
-Defining constant string literals in this manner is slightly more flexible than an `enum` object,
-because a string literal (e.g. `"apple"`) satisfies the `Fruit` type. For example, the following
-code will compile:
-
-```ts
-function getFruitColor(fruit: Fruit): string {
-  ...
-}
-
-const appleColor = getFruitColor("apple")
-```
-
-However, defining constant string literals in this manner has the following drawbacks:
-
-1.  The values represented by the `Fruit` type do not have `enum`-like accessors, like
-    `Fruits.APPLE`, or `Fruits.BANANA`.
-2.  As with the `enum` object, associating the values represented by the `Fruit` type with other
-    constant values and/or definitions requires the addition of additional types, data structures
-    and/or definitions.
