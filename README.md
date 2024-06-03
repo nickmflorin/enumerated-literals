@@ -1,7 +1,8 @@
 # Enumerated Literals
 
-The `enumerated-literals` package provides a strongly-typed, type-safe and convenient pattern for
-defining, organizing and managing constant string values in an application.
+The `enumerated-literals` package is a _zero-dependency_ package that provides a strongly-typed,
+type-safe and convenient pattern for defining, organizing and managing constant string values in an
+application.
 
 ```bash
 npm install enumerated-literals
@@ -17,9 +18,10 @@ enumeratedLiterals<L extends Literals, O extends EnumeratedLiteralsOptions<L>>(l
 ```
 
 The first argument to the `enumeratedLiterals` method, `L` (or `Literals`), should be a `const`
-(`readonly`) array of `string` values or `object` values that contain a `value` key. The second
-argument provided to the `enumeratedLiterals` method, `O` (or `EnumeratedLiteralsOptions<L>`),
-should be an `object` type that contains the options for the instance.
+(`readonly`) array of `string` values (`string[]`) or `object` values, each of which contains a
+`value` key (`{ value: string }`[]). The second argument provided to the `enumeratedLiterals`
+method, `O` (or `EnumeratedLiteralsOptions<L>`), should be an `object` type that contains the
+options for the instance (see [Configuration Options](#configuration-options)).
 
 ###### Example
 

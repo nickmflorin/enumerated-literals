@@ -1,5 +1,3 @@
-import { z } from "zod";
-
 export type LiteralsArray = readonly [string, ...string[]];
 
 export type LiteralsBaseModel<V extends string = string> = {
@@ -7,27 +5,38 @@ export type LiteralsBaseModel<V extends string = string> = {
   readonly accessor?: string;
 };
 
-export const LiteralsBaseModelSchema = z.object({
-  value: z.string(),
-  accessor: z.string().optional(),
-});
-
 export const isLiteralModel = <V extends string = string>(
   v: V | LiteralsBaseModel<V>,
-): v is LiteralsBaseModel<V> => typeof v !== "string";
+): v is LiteralsBaseModel<V> => typeof v !== "string" && "value" in v && v.value !== undefined;
 
 export type LiteralsBaseModelArray<V extends string = string> = readonly LiteralsBaseModel<V>[];
 
 export type Literals = LiteralsArray | LiteralsBaseModelArray;
 
-export const literalsAreModelArray = (l: unknown): l is LiteralsBaseModelArray => {
-  const schema = z.array(LiteralsBaseModelSchema);
-  return schema.safeParse(l).success;
+export const literalsAreModelArray = (literals: Literals): literals is LiteralsBaseModelArray => {
+  if (literals.some(l => isLiteralModel(l))) {
+    if (!literals.every(l => isLiteralModel(l))) {
+      throw new Error(
+        "Encountered a set of literals that contains a combination of strings and models. " +
+          "The literals must either contain all strings, or all models.",
+      );
+    }
+    return true;
+  }
+  return false;
 };
 
-export const literalsAreArray = (l: unknown): l is LiteralsArray => {
-  const schema = z.array(z.string());
-  return schema.safeParse(l).success;
+export const literalsAreArray = (literals: Literals): literals is LiteralsArray => {
+  if (literals.some(l => typeof l === "string")) {
+    if (!literals.every(l => typeof l === "string")) {
+      throw new Error(
+        "Encountered a set of literals that contains a combination of strings and models. " +
+          "The literals must either contain all strings, or all models.",
+      );
+    }
+    return true;
+  }
+  return false;
 };
 
 export type LiteralsValue<L extends Literals> = L extends LiteralsArray
