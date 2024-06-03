@@ -5,17 +5,27 @@ describe(
   () => {
     it("the getModel() method properly throws when the literals value does not " + "exist", () => {
       const Literals = enumeratedLiterals(
-        [{ value: "apple" }, { value: "banana" }, { value: "blueberry" }, { value: "orange" }],
+        [
+          { value: "apple" },
+          { value: "banana" },
+          { value: "blueberry" },
+          { value: "orange" },
+        ] as const,
         {},
       );
-      expect(() => Literals.getModelSafe("foobar", { strict: true })).toThrow();
+      expect(() => Literals.getModel("foobar" as "apple")).toThrow();
     });
     it(
       "the getModel() method properly returns when the literals model is " +
         "instantiated with models and no other attributes",
       () => {
         const Literals = enumeratedLiterals(
-          [{ value: "apple" }, { value: "banana" }, { value: "blueberry" }, { value: "orange" }],
+          [
+            { value: "apple" },
+            { value: "banana" },
+            { value: "blueberry" },
+            { value: "orange" },
+          ] as const,
           {},
         );
         expect(Literals.getModel("apple")).toMatchObject({ value: "apple" });
@@ -34,7 +44,7 @@ describe(
             { value: "banana", color: "yellow", accessor: "BANANA" },
             { value: "blueberry", color: "blue", accessor: "BLUEBERRY" },
             { value: "orange", color: "orange", accessor: "ORANGE" },
-          ],
+          ] as const,
           {},
         );
         expect(Literals.getModel("apple")).toMatchObject({ value: "apple", color: "red" });
@@ -50,7 +60,10 @@ describe(
       "the getModel() method properly returns when the literals model is " +
         "instantiated with values",
       () => {
-        const Literals = enumeratedLiterals(["apple", "banana", "blueberry", "orange"], {});
+        const Literals = enumeratedLiterals(
+          ["apple", "banana", "blueberry", "orange"] as const,
+          {},
+        );
 
         expect(Literals.getModel("apple")).toMatchObject({ value: "apple" });
         expect(Literals.getModel("banana")).toMatchObject({ value: "banana" });
@@ -69,7 +82,12 @@ describe(
       "the getModelSafe() method properly returns null when the literals value does not " + "exist",
       () => {
         const Literals = enumeratedLiterals(
-          [{ value: "apple" }, { value: "banana" }, { value: "blueberry" }, { value: "orange" }],
+          [
+            { value: "apple" },
+            { value: "banana" },
+            { value: "blueberry" },
+            { value: "orange" },
+          ] as const,
           {},
         );
         expect(Literals.getModelSafe("foobar", {})).toBeNull();
@@ -79,7 +97,12 @@ describe(
       "the getModelSafe() method properly throws when the literals value does not " + "exist",
       () => {
         const Literals = enumeratedLiterals(
-          [{ value: "apple" }, { value: "banana" }, { value: "blueberry" }, { value: "orange" }],
+          [
+            { value: "apple" },
+            { value: "banana" },
+            { value: "blueberry" },
+            { value: "orange" },
+          ] as const,
           {},
         );
         expect(() => Literals.getModelSafe("foobar", { strict: true })).toThrow();
@@ -90,7 +113,12 @@ describe(
         "instantiated with models and no other attributes",
       () => {
         const Literals = enumeratedLiterals(
-          [{ value: "apple" }, { value: "banana" }, { value: "blueberry" }, { value: "orange" }],
+          [
+            { value: "apple" },
+            { value: "banana" },
+            { value: "blueberry" },
+            { value: "orange" },
+          ] as const,
           {},
         );
         expect(Literals.getModelSafe("apple", {})).toMatchObject({ value: "apple" });
@@ -109,7 +137,7 @@ describe(
             { value: "banana", color: "yellow", accessor: "BANANA" },
             { value: "blueberry", color: "blue", accessor: "BLUEBERRY" },
             { value: "orange", color: "orange", accessor: "ORANGE" },
-          ],
+          ] as const,
           {},
         );
         expect(Literals.getModelSafe("apple", {})).toMatchObject({ value: "apple", color: "red" });
@@ -131,7 +159,10 @@ describe(
       "the getModelSafe() method properly returns when the literals model is " +
         "instantiated with values",
       () => {
-        const Literals = enumeratedLiterals(["apple", "banana", "blueberry", "orange"], {});
+        const Literals = enumeratedLiterals(
+          ["apple", "banana", "blueberry", "orange"] as const,
+          {},
+        );
 
         expect(Literals.getModelSafe("apple", {})).toMatchObject({ value: "apple" });
         expect(Literals.getModelSafe("banana", {})).toMatchObject({ value: "banana" });
