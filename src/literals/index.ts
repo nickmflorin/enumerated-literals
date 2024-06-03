@@ -82,7 +82,7 @@ export const enumeratedLiterals = <L extends Literals, O extends EnumeratedLiter
   return {
     ...parseAccessors(literals, options),
     __provided_form__: areModels.every(Boolean) ? "models" : "values",
-    options,
+    __options__: options,
     values,
     models,
     humanize(options) {
@@ -130,8 +130,8 @@ export const enumeratedLiterals = <L extends Literals, O extends EnumeratedLiter
       return this.getModel(v as LiteralsValue<L>);
     },
     throwInvalidValue(this: EnumeratedLiterals<L, O>, v: unknown, errorMessage?: string): never {
-      if (errorMessage === undefined && this.options.invalidValueErrorMessage !== undefined) {
-        throw new Error(this.options.invalidValueErrorMessage(this.values, v));
+      if (errorMessage === undefined && this.__options__.invalidValueErrorMessage !== undefined) {
+        throw new Error(this.__options__.invalidValueErrorMessage(this.values, v));
       } else if (errorMessage) {
         throw new Error(errorMessage);
       } else if (this.values.length === 0) {
@@ -176,7 +176,7 @@ export const enumeratedLiterals = <L extends Literals, O extends EnumeratedLiter
         );
       }
       const newOptions = {
-        ...pickStaticOptions<L, O>(this.options),
+        ...pickStaticOptions<L, O>(this.__options__),
         ...opts,
       } as OptionsWithNewSet<ExtractLiterals<L, T>, Ot, L, O>;
 
@@ -208,7 +208,7 @@ export const enumeratedLiterals = <L extends Literals, O extends EnumeratedLiter
         );
       }
       const newOptions = {
-        ...pickStaticOptions<L, O>(this.options),
+        ...pickStaticOptions<L, O>(this.__options__),
         ...opts,
       } as OptionsWithNewSet<ExcludeLiterals<L, T>, Ot, L, O>;
 

@@ -52,6 +52,12 @@ type GetModelSafe<L extends Literals> = {
   <O extends GetModelSafeOptions>(value: unknown, opts: O): GetModelSafeRT<L, O>;
 };
 
+/**
+ * @template L - The {@link EnumeratedLiterals} instance type.
+ *
+ * The type of the constant string literals on the {@link EnumeratedLiterals} instance defined by
+ * the generic type parameter 'L'.
+ */
 export type EnumeratedLiteralsType<L> =
   L extends EnumeratedLiterals<
     infer Ll extends Literals,
@@ -84,9 +90,28 @@ export type EnumeratedLiterals<
   O extends EnumeratedLiteralsOptions<L>,
 > = EnumeratedLiteralsAccessors<L, O> & {
   readonly __provided_form__: EnumeratedLiteralsProvidedForm;
+  readonly __options__: O;
   readonly values: LiteralsValues<L>;
   readonly models: LiteralsModels<L>;
-  readonly options: O;
+  /**
+   * Returns a human readable string representing the constant string literal values associated with
+   * the {@link EnumeratedLiterals} instance.
+   *
+   * @example
+   * ```ts
+   * import { enumeratedLiterals } from "enumerated-literals";
+   *
+   * const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+   * // "apple, banana, blueberry, or orange"
+   * Fruits.humanize({ conjunction: "or" });
+   * ```
+   *
+   * @param {HumanizeListOptions<string>} options
+   *   Options that can be used to customize the humanized string.
+   *
+   * @returns {string}
+   *   A human readable representation of the values on the {@link EnumeratedLiterals} instance.
+   */
   readonly humanize: (options?: HumanizeListOptions<string>) => string;
   readonly getAttributes: <N extends LiteralsModelAttributeName<L>>(
     attribute: N,
@@ -95,6 +120,19 @@ export type EnumeratedLiterals<
     value: V,
     attribute: N,
   ) => LiteralsAttributeValue<L, V, N>;
+  /**
+   * Returns the model associated with a specific constant string literal value,
+   * {@link LiteralsValue<L>} on the {@link EnumeratedLiterals}.
+   *
+   * @example
+   *
+   * ```ts
+   * import { enumeratedLiterals } from "enumerated-literals";
+   *
+   * const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+   * Fruits.getModel("apple") // Returns { value: "apple" }
+   * ```
+   */
   readonly getModel: <V extends LiteralsValue<L>>(v: V) => LiteralsModel<L, V>;
   /**
    * Returns the model associated with a specific constant string literal value,
@@ -121,10 +159,55 @@ export type EnumeratedLiterals<
    *
    * // Same as above
    * Fruits.getModelSafe(v, {});
+   * ```
    */
   readonly getModelSafe: GetModelSafe<L>;
+  /**
+   * Returns the provided value, 'v', typed as a value in the set of constant string literal values
+   * on the {@link EnumeratedLiterals} instance, {@link LiteralsValue<V>}, if the value is indeed
+   * in the set of constant string literal values on the {@link EnumeratedLiterals} instance.
+   *
+   * Otherwise, the method will throw an {@link Error}.
+   *
+   * @param {unknown} v
+   *   The value that should be parsed.
+   *
+   * @param {string} errorMessage
+   *   An optional error message that should be used when an {@link Error} is thrown due to the
+   *   provided value 'v' not being in the set of constant string literal values on the
+   *   {@link EnumeratedLiterals} instance.
+   *
+   * @returns {LiteralsValue<L>}
+   *   The provided value, 'v', typed as a value in the set of constant string literal values on the
+   *   {@link EnumeratedLiterals} instance, if the provided value 'v' exists on the set of
+   *   constants string literal values on the {@link EnumeratedLiterals} instance.
+   */
   readonly parse: (v: unknown, errorMessage?: string) => LiteralsValue<L>;
+  /**
+   * A type assertion that throws an `Error` if the provided value is not in the set of constant
+   * string literal values on the {@link EnumeratedLiterals} instance.
+   *
+   * @param {unknown} v
+   *   The value that the assertion should be made with.
+   *
+   * @param {string} errorMessage
+   *   An optional error message that should be used when an {@link Error} is thrown due to the
+   *   provided value 'v' not being in the set of constant string literal values on the
+   *   {@link EnumeratedLiterals} instance.
+   */
   readonly assert: EnumeratedLiteralsAssertion<L>;
+  /**
+   * A typeguard that returns whether or not the provided value 'v' is in the set of constant string
+   * literal values on the {@link EnumeratedLiterals} instance.
+   *
+   * @param {unknown} v
+   *   The value for which the determination should be made as to whether it is in the set of
+   *   constant string literal values on the {@link EnumeratedLiterals} instance.
+   *
+   * @returns {v is LiteralsValue<L>}
+   *   Whether or not the provided value 'v' is in the set of constant string literal values on the
+   *   {@link EnumeratedLiterals} instance.
+   */
   readonly contains: (v: unknown) => v is LiteralsValue<L>;
   readonly pick: <
     T extends readonly LiteralsValues<L>[number][],
