@@ -23,6 +23,37 @@ The first argument to the `enumeratedLiterals` method, `L` (or `Literals`), shou
 method, `O` (or `EnumeratedLiteralsOptions<L>`), should be an `object` type that contains the
 options for the instance (see [Configuration Options](#configuration-options)).
 
+### Why Not `enum`(s)?
+
+The primary motivation for the `enumerated-literals` package was the fact that constant string
+literals are not assignable to their equivalent `enum` members:
+
+```ts
+enum Fruits {
+  APPLE = "apple",
+  BANANA = "banana",
+  BLUEBERRY = "blueberry",
+  ORANGE = "orange",
+}
+
+function getFruitColor(fruit: Fruits): string {
+  ...
+}
+
+// Error: Argument of type '"apple"' is not assignable to parameter of type 'Fruits'
+const appleColor = getFruitColor("apple");
+```
+
+This means that whenever the `getFruitColor` function is used throughout an application or codebase,
+it requires also importing `Fruits`. While this might seem like a small inconvenience, its
+inflexibility can be a pain point in larger applications with a significant number of constants
+defined in `enum` fashion.
+
+Additionally, the `EnumeratedLiterals` instance offers built-in type-checking methods and strongly
+typed properties, which provide a more convenient and organized way of making assertions and
+type-checking values related to the constant string literals the instance is associated with (see
+[Built-In Type Checking](#built-in-type-checking)).
+
 ###### Example
 
 ```ts
@@ -38,7 +69,7 @@ const doSomethingWithFruit = (fruit: Fruit): void;
 doSomethingWithFruit("apple");
 ```
 
-#### Terminology
+## Terminology
 
 The following terms will be referenced throughout this documentation:
 
