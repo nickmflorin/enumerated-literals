@@ -91,7 +91,13 @@ export type EnumeratedLiterals<
 > = EnumeratedLiteralsAccessors<L, O> & {
   readonly __provided_form__: EnumeratedLiteralsProvidedForm;
   readonly __options__: O;
+  /**
+   * The constant string literal values on the {@link EnumeratedLiterals} instance.
+   */
   readonly values: LiteralsValues<L>;
+  /**
+   * The {@link object}(s) associated with each value on the {@link EnumeratedLiterals} instance.
+   */
   readonly models: LiteralsModels<L>;
   /**
    * Returns a human readable string representing the constant string literal values associated with
@@ -113,9 +119,53 @@ export type EnumeratedLiterals<
    *   A human readable representation of the values on the {@link EnumeratedLiterals} instance.
    */
   readonly humanize: (options?: HumanizeListOptions<string>) => string;
+  /**
+   * @template {LiteralsModelAttributeName<L>} N - The attribute name.
+   *
+   * Returns the values for a given attribute, {@link N}, on each model that is associated with
+   * the {@link EnumeratedLiterals} instance.
+   *
+   * @param {N} attribute
+   *   The name of the attribute for which the values should be returned.
+   *
+   * @returns {LiteralsAttributeValues<L, N>}
+   *   The values for the given attribute, {@link N}, on each model associated with the
+   *   {@link EnumeratedLiterals} instance.
+   */
   readonly getAttributes: <N extends LiteralsModelAttributeName<L>>(
     attribute: N,
   ) => LiteralsAttributeValues<L, N>;
+  /**
+   * @template {LiteralsValue<L>} value - The model value.
+   * @template {LiteralsModelAttributeName<L>} N - The attribute name.
+   *
+   * Returns the value for a given attribute, {@link N}, on the model associated with a specific
+   * value, {@link V}, on the {@link EnumeratedLiterals} instance.
+   *
+   * @example
+   * ```ts
+   * import { enumeratedLiterals } from "enumerated-literals";
+   *
+   * const Fruits = enumeratedLiterals([
+   *   { value: "apple", description: "A red fruit", label: "Apple" },
+   *   { value: "banana", description: "A yellow fruit", label: "Banana" },
+   *   { value: "blueberry", description: "A blue fruit", label: "Blueberry" },
+   *   { value: "orange", description: "An orange fruit", label: "Orange" }
+   * ] as const, {});
+   *
+   * Fruits.getAttribute("apple", "description"); // "A red fruit"
+   * ```
+   *
+   * @param {V} value
+   *   The value on the {@link EnumeratedLiterals} instance.
+   *
+   * @param {N} attribute
+   *   The name of the attribute for which the value should be returned.
+   *
+   * @returns {LiteralsAttributeValue<L, V, N>}
+   *   The value for the given attribute, {@link N}, on the model associated with the value,
+   *   {@link V}, on the {@link EnumeratedLiterals} instance.
+   */
   readonly getAttribute: <V extends LiteralsValue<L>, N extends LiteralsModelAttributeName<L>>(
     value: V,
     attribute: N,
@@ -209,6 +259,10 @@ export type EnumeratedLiterals<
    *   {@link EnumeratedLiterals} instance.
    */
   readonly contains: (v: unknown) => v is LiteralsValue<L>;
+  /**
+   * Returns a new {@link EnumeratedLiterals} instance that consists of just the values that are
+   * provided to the method.
+   */
   readonly pick: <
     T extends readonly LiteralsValues<L>[number][],
     Ot extends EnumeratedLiteralsDynamicOptions<ExtractLiterals<L, T>>,
@@ -219,6 +273,10 @@ export type EnumeratedLiterals<
     ExtractLiterals<L, T>,
     OptionsWithNewSet<ExtractLiterals<L, T>, Ot, L, O>
   >;
+  /**
+   * Returns a new {@link EnumeratedLiterals} instance that consists of just the values on the
+   * instance exluding those that are provided to the method.
+   */
   readonly omit: <
     T extends readonly LiteralsValues<L>[number][],
     Ot extends EnumeratedLiteralsDynamicOptions<ExcludeLiterals<L, T>>,
@@ -229,5 +287,10 @@ export type EnumeratedLiterals<
     ExcludeLiterals<L, T>,
     OptionsWithNewSet<ExcludeLiterals<L, T>, Ot, L, O>
   >;
+  /**
+   * Throws an {@link Error} with a message that is generated based on optionally provided options
+   * to the {@link EnumeratedLiterals} instance on instantiation and/or the constant string literal
+   * values that are associated with the instance.
+   */
   readonly throwInvalidValue: (v: unknown, errorMessage?: string) => void;
 };

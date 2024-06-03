@@ -468,8 +468,7 @@ Fruits.values; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
 
 ##### `models` (_property_)
 
-The `object`(s) associated with each `EnumeratedLiterals` value on the `EnumeratedLiterals`
-instance.
+The `object`(s) associated with each value on the `EnumeratedLiterals` instance.
 
 ```ts
 LiteralsModels<L>;
@@ -654,8 +653,8 @@ Fruits.getModelSafe(v, {});
 
 ##### `getAttribute` (_method_)
 
-Returns the value of an attribute, `N`, associated with a specific value on the `EnumeratedLiterals`
-instance.
+Returns the value of an attribute, `N`, on the model associated with a specific value on the
+`EnumeratedLiterals` instance.
 
 ```ts
 <V extends LiteralsValue<L>, N extends LiteralsModelAttributeName<L>>(value: V, attribute: N): LiteralsAttributeValue<L, V, N>
@@ -681,7 +680,7 @@ Fruits.getAttribute("apple", "description"); // Typed as "A red fruit"
 
 ##### `getAttributes` (_method_)
 
-Returns the values of a given attribute, `N`, associated with a all constant string literals on the
+Returns the values for a given attribute, `N`, on each model that is associated with the
 `EnumeratedLiterals` instance.
 
 ```ts
