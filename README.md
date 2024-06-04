@@ -1,5 +1,7 @@
 # Enumerated Literals
 
+[![codecov](https://codecov.io/gh/nickmflorin/enumerated-literals/graph/badge.svg?token=GRCS92W4N6)](https://codecov.io/gh/nickmflorin/enumerated-literals)
+
 The `enumerated-literals` package is a _zero-dependency_ package that provides a strongly-typed,
 type-safe and convenient pattern for defining, organizing and managing constant string values in an
 application.
