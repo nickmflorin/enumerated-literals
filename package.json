@@ -41,7 +41,7 @@
     "unit-test": "jest --detectOpenHandles --forceExit --silent=false --selectProjects=unit-tests",
     "eslint-test": "jest --detectOpenHandles --forceExit --silent=false --selectProjects=eslint-tests",
     "prettier-test": "jest --detectOpenHandles --forceExit --silent=false --selectProjects=prettier-tests",
-    "test:ci": "jest",
+    "test:ci": "jest --config ./jest.config.coverage.ts",
     "tsc": "tsc --project ./tsconfig.json"
   },
   "keywords": [

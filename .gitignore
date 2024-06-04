@@ -17,3 +17,6 @@ yarn-error.log*
 
 # Build
 /dist
+
+# Coverage
+/coverage

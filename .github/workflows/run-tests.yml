@@ -13,11 +13,15 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Install dependencies
+      - name: Install Dependencies
         run: npm ci
-      - name: Run tests and collect coverage
+      - name: Run ESLint Tests
+        run: npm run eslint-test
+      - name: Run Prettier Tests
+        run: npm run prettier-test
+      - name: Run Unit Tests and Collect Coverage
         run: npm run test:ci
-      - name: Upload coverage reports
+      - name: Upload Coverage Reports
         uses: codecov/codecov-action@v4.0.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
