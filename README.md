@@ -27,7 +27,7 @@ type that contains the options for the instance (see
 ###### Example
 
 ```ts
-import { enumeratedLiterals } from "enumerated-literals";
+import { enumeratedLiterals, type EnumeratedLiteralsType } from "enumerated-literals";
 
 const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
 type Fruit = EnumeratedLiteralType<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
