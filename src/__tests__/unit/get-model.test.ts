@@ -1,4 +1,4 @@
-import { enumeratedLiterals } from "~/literals";
+import { InvalidLiteralValueError, enumeratedLiterals } from "~/literals";
 
 describe(
   "the literals object is properly attributed with a 'getModel' method that " + "properly returns",
@@ -13,7 +13,7 @@ describe(
         ] as const,
         {},
       );
-      expect(() => Literals.getModel("foobar" as "apple")).toThrow();
+      expect(() => Literals.getModel("foobar" as "apple")).toThrow(InvalidLiteralValueError);
     });
     it(
       "the getModel() method properly returns when the literals model is " +
@@ -105,7 +105,9 @@ describe(
           ] as const,
           {},
         );
-        expect(() => Literals.getModelSafe("foobar", { strict: true })).toThrow();
+        expect(() => Literals.getModelSafe("foobar", { strict: true })).toThrow(
+          InvalidLiteralValueError,
+        );
       },
     );
     it(

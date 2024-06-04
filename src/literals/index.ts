@@ -1,4 +1,5 @@
 import { humanizeList } from "~/formatters";
+import { InvalidLiteralValueError } from "~/literals/errors";
 
 import { parseAccessors } from "./accessors";
 import {
@@ -26,6 +27,7 @@ import {
   pickStaticOptions,
 } from "./options";
 
+export { InvalidLiteralValueError } from "./errors";
 export {
   type EnumeratedLiterals,
   type EnumeratedLiteralsType,
@@ -130,20 +132,10 @@ export const enumeratedLiterals = <L extends Literals, O extends EnumeratedLiter
       return this.getModel(v as LiteralsValue<L>);
     },
     throwInvalidValue(this: EnumeratedLiterals<L, O>, v: unknown, errorMessage?: string): never {
-      if (errorMessage === undefined && this.__options__.invalidValueErrorMessage !== undefined) {
-        throw new Error(this.__options__.invalidValueErrorMessage(this.values, v));
-      } else if (errorMessage) {
-        throw new Error(errorMessage);
-      } else if (this.values.length === 0) {
-        throw new Error(
-          "Internal Error: The values on the literals instance are empty, this should not " +
-            "be allowed, and should have been checked before this point in the code!",
-        );
-      } else if (this.values.length === 1) {
-        throw new Error(`The value ${v} is not valid, it must be ${this.values[0]}.`);
-      }
-      const humanizedValues = this.humanize({ conjunction: "or" });
-      throw new Error(`The value ${v} is not valid, it must be one of ${humanizedValues}.`);
+      throw new InvalidLiteralValueError(v, {
+        message: errorMessage ?? this.__options__.invalidValueErrorMessage,
+        values: this.values,
+      });
     },
     contains(this: EnumeratedLiterals<L, O>, v: unknown): v is LiteralsValue<L> {
       return typeof v === "string" && this.values.includes(v);

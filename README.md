@@ -55,7 +55,7 @@ function getFruitColor(fruit: Fruits): string {
   ...
 }
 
-// Error: Argument of type '"apple"' is not assignable to parameter of type 'Fruits'
+// InvalidLiteralValueError: Argument of type '"apple"' is not assignable to parameter of type 'Fruits'
 const appleColor = getFruitColor("apple");
 ```
 
@@ -171,7 +171,7 @@ The `assert` method will throw an error if the value that it is provided is not 
 constant string literals defined on the `EnumeratedLiterals` instance:
 
 ```ts
-Fruits.assert("cucumber"); // throws an Error
+Fruits.assert("cucumber"); // throws an InvalidLiteralValueError
 ```
 
 ##### Type Guard
@@ -284,8 +284,8 @@ their constant representations:
 Fruits.getModel("apple");
 ```
 
-The method will throw an `Error` if the provided value is not in the set of constant string literals
-on the instance.
+The method will throw an `InvalidLiteralValueError` if the provided value is not in the set of
+constant string literals on the instance.
 
 The arguments to the methods are all strongly typed, such that the following code will not compile:
 
@@ -294,9 +294,9 @@ Fruits.getModel("cucumber");
 ```
 
 Similarly, `EnumeratedLiterals` instance is equipped with a `getModelSafe` method, that allows
-whether or not an `Error` should be thrown in the case that the value provided is not in the set of
-constant string literals on the instance or the method should simply return `null` to be controlled
-via a `strict` option:
+whether or not an `InvalidLiteralValueError` should be thrown in the case that the value provided is
+not in the set of constant string literals on the instance or the method should simply return `null`
+to be controlled via a `strict` option:
 
 ```ts
 Fruits.getModelSafe("cucumber", { strict: true }); // Throws Error, but compiles
@@ -340,8 +340,8 @@ The optional options that can be provided to the `enumeratedLiterals` method are
 
 1. **`invalidValueErrorMessage`** (`EnumeratedLiteralsInvalidValueErrorMessage`):
 
-   A function that can be used to format the error message for the `Error` that is thrown when an
-   invalid value is encountered by the `EnumeratedLiterals` instance.
+   A function that can be used to format the error message for the `InvalidLiteralValueError` that
+   is thrown when an invalid value is encountered by the `EnumeratedLiterals` instance.
 
    ###### Example
 
@@ -508,8 +508,8 @@ Fruits.models;
 
 ##### `assert` (_method_)
 
-A type assertion that throws an `Error` if the provided value is not in the set of constant string
-literal values on the `EnumeratedLiterals` instance.
+A type assertion that throws an `InvalidLiteralValueError` if the provided value is not in the set
+of constant string literal values on the `EnumeratedLiterals` instance.
 
 ```ts
 <L extends Literals>(value: unknown, errorMessage?: string): asserts value is LiteralsValue<L>;
@@ -534,7 +534,8 @@ function process(value: unknown) {
 ##### `parse` (_method_)
 
 Returns the provided value, typed as a value in the set of constant string literal values on the
-`EnumeratedLiterals` instance, if the value is indeed in that set. Otherwise, throws an `Error`.
+`EnumeratedLiterals` instance, if the value is indeed in that set. Otherwise, throws an
+`InvalidLiteralValueError`.
 
 ```ts
 (v: unknown, errorMessage?: string): LiteralsValue<L>;
@@ -586,9 +587,9 @@ function process(value: unknown) {
 ##### `getModel` (_method_)
 
 Returns the model associated with a specific constant string literal value on the
-`EnumeratedLiterals` instance. Throws an `Error` if the provided value is not a specific constant
-string literal on the `EnumeratedLiterals` instance - however, the method is typed such that the
-compiler will fail if you attempt to provide an invalid value.
+`EnumeratedLiterals` instance. Throws an `InvalidLiteralValueError` if the provided value is not a
+specific constant string literal on the `EnumeratedLiterals` instance - however, the method is typed
+such that the compiler will fail if you attempt to provide an invalid value.
 
 ```ts
 <V extends LiteralsValue<L>>(v: V): LiteralsModel<L, V>;
@@ -617,9 +618,9 @@ instance.
 
 In other words, this method does not assume that the provided value is in the set of constant string
 literals on the `EnumeratedLiterals` instance, but instead will either return `null` (if
-`options.strict` is `false` or not provided) or throw an `Error` (if `options.strict` is `true`) if
-the provided value is not in the set of constant string literals on the `EnumeratedLiterals`
-instance.
+`options.strict` is `false` or not provided) or throw an `InvalidLiteralValueError` (if
+`options.strict` is `true`) if the provided value is not in the set of constant string literals on
+the `EnumeratedLiterals` instance.
 
 ###### Example
 
@@ -773,9 +774,9 @@ Fruits.humanize({ conjunction: "or" });
 
 ##### `throwInvalidValue` (_method_)
 
-Throws an `Error` with a message that is generated based on optionally provided options to the
-`EnumeratedLiterals` instance on instantiation and/or the constant string literal values that are
-associated with the instance.
+Throws an `InvalidLiteralValueError` with a message that is generated based on optionally provided
+options to the `EnumeratedLiterals` instance on instantiation and/or the constant string literal
+values that are associated with the instance.
 
 ```ts
 (v: unknown, errorMessage?: string): never;
@@ -788,5 +789,7 @@ import { enumeratedLiterals } from "enumerated-literals";
 
 const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
 
-Fruits.throwInvalidValue("cucumber"); // throws a descriptive Error
+// throws InvalidLiteralValueError
+// "The value 'cucumber' is invalid, it must be one of 'apple', 'banana', 'blueberry' or 'orange'."
+Fruits.throwInvalidValue("cucumber");
 ```

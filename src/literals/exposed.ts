@@ -89,7 +89,13 @@ export type EnumeratedLiterals<
   L extends Literals,
   O extends EnumeratedLiteralsOptions<L>,
 > = EnumeratedLiteralsAccessors<L, O> & {
+  /**
+   * Private property that should not be accessed externally.
+   */
   readonly __provided_form__: EnumeratedLiteralsProvidedForm;
+  /**
+   * Private property that should not be accessed externally.
+   */
   readonly __options__: O;
   /**
    * The constant string literal values on the {@link EnumeratedLiterals} instance.
@@ -191,9 +197,9 @@ export type EnumeratedLiterals<
    *
    * In other words, this method does not assume that the provided value is in the set of constant
    * string literals on the {@link EnumeratedLiterals} instance, but instead will either return
-   * `null` (if `options.strict` is `false` or not provided) or throw an {@link Error} (if
-   * `options.strict` is `true`) if the provided value is not in the set of constant string literals
-   * on the {@link EnumeratedLiterals} instance.
+   * `null` (if `options.strict` is `false` or not provided) or throw an
+   * {@link InvalidLiteralValueError} (if `options.strict` is `true`) if the provided value is not
+   * in the set of constant string literals on the {@link EnumeratedLiterals} instance.
    *
    * @example
    *
@@ -217,7 +223,7 @@ export type EnumeratedLiterals<
    * on the {@link EnumeratedLiterals} instance, {@link LiteralsValue<V>}, if the value is indeed
    * in the set of constant string literal values on the {@link EnumeratedLiterals} instance.
    *
-   * Otherwise, the method will throw an {@link Error}.
+   * Otherwise, the method will throw an {@link InvalidLiteralValueError}.
    *
    * @param {unknown} v
    *   The value that should be parsed.
@@ -234,15 +240,16 @@ export type EnumeratedLiterals<
    */
   readonly parse: (v: unknown, errorMessage?: string) => LiteralsValue<L>;
   /**
-   * A type assertion that throws an `Error` if the provided value is not in the set of constant
-   * string literal values on the {@link EnumeratedLiterals} instance.
+   * A type assertion that throws an {@link InvalidLiteralValueError} if the provided value is not
+   * in the set of constant string literal values on the {@link EnumeratedLiterals} instance.
    *
    * @param {unknown} v
    *   The value that the assertion should be made with.
    *
    * @param {string} errorMessage
-   *   An optional error message that should be used when an {@link Error} is thrown due to the
-   *   provided value 'v' not being in the set of constant string literal values on the
+   *   An optional error message that should be used when an {@link InvalidLiteralValueError} is
+   *   thrown due to the provided value 'v' not being in the set of constant string literal values
+   *   on the
    *   {@link EnumeratedLiterals} instance.
    */
   readonly assert: EnumeratedLiteralsAssertion<L>;
@@ -288,9 +295,9 @@ export type EnumeratedLiterals<
     OptionsWithNewSet<ExcludeLiterals<L, T>, Ot, L, O>
   >;
   /**
-   * Throws an {@link Error} with a message that is generated based on optionally provided options
-   * to the {@link EnumeratedLiterals} instance on instantiation and/or the constant string literal
-   * values that are associated with the instance.
+   * Throws an {@link InvalidLiteralValueError} with a message that is generated based on optionally
+   * provided options to the {@link EnumeratedLiterals} instance on instantiation and the optional
+   * message {@link string} that is provided as the seconda argument to the method.
    */
   readonly throwInvalidValue: (v: unknown, errorMessage?: string) => void;
 };
