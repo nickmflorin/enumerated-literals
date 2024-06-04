@@ -5,7 +5,7 @@ type-safe and convenient pattern for defining, organizing and managing constant 
 application.
 
 ```bash
-npm install enumerated-literals
+$ npm install enumerated-literals
 ```
 
 ## Basics

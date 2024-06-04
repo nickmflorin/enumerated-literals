@@ -1,39 +1,26 @@
+import type * as core from "./core";
+import type * as options from "./options";
+
 import { type HumanizeListOptions } from "~/formatters";
 
 import { type EnumeratedLiteralsAccessors } from "./accessors";
-import {
-  type Literals,
-  type LiteralsValues,
-  type LiteralsArray,
-  type LiteralsValue,
-  type ExcludeLiterals,
-  type ExtractLiterals,
-  type LiteralsBaseModelArray,
-  type LiteralsModels,
-  type LiteralsModelAttributeName,
-  type LiteralsAttributeValues,
-  type LiteralsAttributeValue,
-} from "./core";
-import {
-  type EnumeratedLiteralsOptions,
-  type OptionsWithNewSet,
-  type EnumeratedLiteralsDynamicOptions,
-} from "./options";
+/* eslint-disable-next-line @typescript-eslint/no-unused-vars -- Used for JSDoc */
+import * as errors from "./errors";
 
-type EnumeratedLiteralsAssertion<L extends Literals> = (
+type EnumeratedLiteralsAssertion<L extends core.Literals> = (
   value: unknown,
   errorMessage?: string,
-) => asserts value is LiteralsValue<L>;
+) => asserts value is core.LiteralsValue<L>;
 
 export type LiteralsModel<
-  L extends Literals,
-  V extends LiteralsValue<L> = LiteralsValue<L>,
-> = L extends LiteralsArray
-  ? V extends LiteralsValue<L>
+  L extends core.Literals,
+  V extends core.LiteralsValue<L> = core.LiteralsValue<L>,
+> = L extends core.LiteralsArray
+  ? V extends core.LiteralsValue<L>
     ? { value: V }
     : never
-  : L extends LiteralsBaseModelArray
-    ? V extends LiteralsValue<L>
+  : L extends core.LiteralsBaseModelArray
+    ? V extends core.LiteralsValue<L>
       ? Extract<L[number], { value: V }>
       : never
     : never;
@@ -42,13 +29,13 @@ export type GetModelSafeOptions = {
   readonly strict?: boolean;
 };
 
-export type GetModelSafeRT<L extends Literals, O extends GetModelSafeOptions> = O extends {
+export type GetModelSafeRT<L extends core.Literals, O extends GetModelSafeOptions> = O extends {
   strict: true;
 }
-  ? LiteralsModel<L, LiteralsValue<L>>
-  : LiteralsModel<L, LiteralsValue<L>> | null;
+  ? LiteralsModel<L, core.LiteralsValue<L>>
+  : LiteralsModel<L, core.LiteralsValue<L>> | null;
 
-type GetModelSafe<L extends Literals> = {
+type GetModelSafe<L extends core.Literals> = {
   <O extends GetModelSafeOptions>(value: unknown, opts: O): GetModelSafeRT<L, O>;
 };
 
@@ -60,20 +47,20 @@ type GetModelSafe<L extends Literals> = {
  */
 export type EnumeratedLiteralsType<L> =
   L extends EnumeratedLiterals<
-    infer Ll extends Literals,
+    infer Ll extends core.Literals,
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
     infer _O
   >
-    ? LiteralsValue<Ll>
+    ? core.LiteralsValue<Ll>
     : never;
 
 export type EnumeratedLiteralsModel<L> =
   L extends EnumeratedLiterals<
-    infer Ll extends Literals,
+    infer Ll extends core.Literals,
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
     infer _O
   >
-    ? LiteralsModel<Ll, LiteralsValue<Ll>>
+    ? LiteralsModel<Ll, core.LiteralsValue<Ll>>
     : never;
 
 export type EnumeratedLiteralsProvidedForm = "models" | "values";
@@ -86,8 +73,8 @@ export type EnumeratedLiteralsProvidedForm = "models" | "values";
  * strongly-typed methods related to those values.
  */
 export type EnumeratedLiterals<
-  L extends Literals,
-  O extends EnumeratedLiteralsOptions<L>,
+  L extends core.Literals,
+  O extends options.EnumeratedLiteralsOptions<L>,
 > = EnumeratedLiteralsAccessors<L, O> & {
   /**
    * Private property that should not be accessed externally.
@@ -100,11 +87,11 @@ export type EnumeratedLiterals<
   /**
    * The constant string literal values on the {@link EnumeratedLiterals} instance.
    */
-  readonly values: LiteralsValues<L>;
+  readonly values: core.LiteralsValues<L>;
   /**
    * The {@link object}(s) associated with each value on the {@link EnumeratedLiterals} instance.
    */
-  readonly models: LiteralsModels<L>;
+  readonly models: core.LiteralsModels<L>;
   /**
    * Returns a human readable string representing the constant string literal values associated with
    * the {@link EnumeratedLiterals} instance.
@@ -121,10 +108,10 @@ export type EnumeratedLiterals<
    * @param {HumanizeListOptions<string>} options
    *   Options that can be used to customize the humanized string.
    *
-   * @returns {string}
-   *   A human readable representation of the values on the {@link EnumeratedLiterals} instance.
+   * @returns {string} A human readable representation of the values on the
+   * {@link EnumeratedLiterals} instance.
    */
-  readonly humanize: (options?: HumanizeListOptions<string>) => string;
+  humanize(options?: HumanizeListOptions<string>): string;
   /**
    * @template {LiteralsModelAttributeName<L>} N - The attribute name.
    *
@@ -134,15 +121,14 @@ export type EnumeratedLiterals<
    * @param {N} attribute
    *   The name of the attribute for which the values should be returned.
    *
-   * @returns {LiteralsAttributeValues<L, N>}
-   *   The values for the given attribute, {@link N}, on each model associated with the
-   *   {@link EnumeratedLiterals} instance.
+   * @returns {LiteralsAttributeValues<L, N>} The values for the given attribute, {@link N}, on each
+   * model associated with the {@link EnumeratedLiterals} instance.
    */
-  readonly getAttributes: <N extends LiteralsModelAttributeName<L>>(
+  getAttributes<N extends core.LiteralsModelAttributeName<L>>(
     attribute: N,
-  ) => LiteralsAttributeValues<L, N>;
+  ): core.LiteralsAttributeValues<L, N>;
   /**
-   * @template {LiteralsValue<L>} value - The model value.
+   * @template {core.LiteralsValue<L>} value - The model value.
    * @template {LiteralsModelAttributeName<L>} N - The attribute name.
    *
    * Returns the value for a given attribute, {@link N}, on the model associated with a specific
@@ -168,17 +154,16 @@ export type EnumeratedLiterals<
    * @param {N} attribute
    *   The name of the attribute for which the value should be returned.
    *
-   * @returns {LiteralsAttributeValue<L, V, N>}
-   *   The value for the given attribute, {@link N}, on the model associated with the value,
-   *   {@link V}, on the {@link EnumeratedLiterals} instance.
+   * @returns {LiteralsAttributeValue<L, V, N>} The value for the given attribute, {@link N}, on
+   * the model associated with the value, {@link V}, on the {@link EnumeratedLiterals} instance.
    */
-  readonly getAttribute: <V extends LiteralsValue<L>, N extends LiteralsModelAttributeName<L>>(
+  getAttribute<V extends core.LiteralsValue<L>, N extends core.LiteralsModelAttributeName<L>>(
     value: V,
     attribute: N,
-  ) => LiteralsAttributeValue<L, V, N>;
+  ): core.LiteralsAttributeValue<L, V, N>;
   /**
    * Returns the model associated with a specific constant string literal value,
-   * {@link LiteralsValue<L>} on the {@link EnumeratedLiterals}.
+   * {@link core.LiteralsValue<L>} on the {@link EnumeratedLiterals}.
    *
    * @example
    *
@@ -189,17 +174,18 @@ export type EnumeratedLiterals<
    * Fruits.getModel("apple") // Returns { value: "apple" }
    * ```
    */
-  readonly getModel: <V extends LiteralsValue<L>>(v: V) => LiteralsModel<L, V>;
+  getModel<V extends core.LiteralsValue<L>>(v: V): LiteralsModel<L, V>;
   /**
    * Returns the model associated with a specific constant string literal value,
-   * {@link LiteralsValue<L>} on the {@link EnumeratedLiterals} instance if that provided value
+   * {@link core.LiteralsValue<L>} on the {@link EnumeratedLiterals} instance if that provided value
    * is in fact on the {@link EnumeratedLiterals} instance.
    *
    * In other words, this method does not assume that the provided value is in the set of constant
    * string literals on the {@link EnumeratedLiterals} instance, but instead will either return
-   * `null` (if `options.strict` is `false` or not provided) or throw an
-   * {@link InvalidLiteralValueError} (if `options.strict` is `true`) if the provided value is not
-   * in the set of constant string literals on the {@link EnumeratedLiterals} instance.
+   * {@link null} or throw.
+   *
+   * @throws An {@link errors.InvalidLiteralValueError} if the provided value 'v' is not in the set
+   * of constant string literals on the {@link EnumeratedLiterals} instance.
    *
    * @example
    *
@@ -217,87 +203,104 @@ export type EnumeratedLiterals<
    * Fruits.getModelSafe(v, {});
    * ```
    */
-  readonly getModelSafe: GetModelSafe<L>;
+  getModelSafe: GetModelSafe<L>;
   /**
    * Returns the provided value, 'v', typed as a value in the set of constant string literal values
-   * on the {@link EnumeratedLiterals} instance, {@link LiteralsValue<V>}, if the value is indeed
-   * in the set of constant string literal values on the {@link EnumeratedLiterals} instance.
+   * on the {@link EnumeratedLiterals} instance, {@link core.LiteralsValue<V>}, if the value is
+   * indeed in the set of constant string literal values on the {@link EnumeratedLiterals} instance.
    *
-   * Otherwise, the method will throw an {@link InvalidLiteralValueError}.
+   * Otherwise, the method will throw an {@link errors.InvalidLiteralValueError}.
    *
    * @param {unknown} v
    *   The value that should be parsed.
    *
    * @param {string} errorMessage
-   *   An optional error message that should be used when an {@link Error} is thrown due to the
-   *   provided value 'v' not being in the set of constant string literal values on the
-   *   {@link EnumeratedLiterals} instance.
+   *   An optional error message that should be included in the message of the
+   *   {@link errors.InvalidLiteralValueError} in the case that the provided value 'v' fails the
+   *   type assertion.
    *
-   * @returns {LiteralsValue<L>}
-   *   The provided value, 'v', typed as a value in the set of constant string literal values on the
-   *   {@link EnumeratedLiterals} instance, if the provided value 'v' exists on the set of
-   *   constants string literal values on the {@link EnumeratedLiterals} instance.
+   * @throws An {@link errors.InvalidLiteralValueError} if the provided value 'v' is not in the set
+   * of constant string literals on the {@link EnumeratedLiterals} instance.
+   *
+   * @returns {core.LiteralsValue<L>} The provided value, 'v', typed as a value in the set of
+   * constant string literal values on the {@link EnumeratedLiterals} instance, if the provided
+   * value 'v' exists on the set of constants string literal values on the
+   * {@link EnumeratedLiterals} instance.
    */
-  readonly parse: (v: unknown, errorMessage?: string) => LiteralsValue<L>;
+  parse(v: unknown, errorMessage?: string): core.LiteralsValue<L>;
   /**
-   * A type assertion that throws an {@link InvalidLiteralValueError} if the provided value is not
-   * in the set of constant string literal values on the {@link EnumeratedLiterals} instance.
+   * A type assertion that throws an {@link errors.InvalidLiteralValueError} if the provided value
+   * is not in the set of constant string literal values on the {@link EnumeratedLiterals} instance.
    *
    * @param {unknown} v
    *   The value that the assertion should be made with.
    *
    * @param {string} errorMessage
-   *   An optional error message that should be used when an {@link InvalidLiteralValueError} is
-   *   thrown due to the provided value 'v' not being in the set of constant string literal values
-   *   on the
-   *   {@link EnumeratedLiterals} instance.
+   *   An optional error message that should be included in the message of the
+   *   {@link errors.InvalidLiteralValueError} in the case that the provided value 'v' fails the
+   *   type assertion.
+   *
+   * @throws An {@link errors.InvalidLiteralValueError} if the provided value 'v' is not in the set
+   * of constant string literals on the {@link EnumeratedLiterals} instance.
    */
-  readonly assert: EnumeratedLiteralsAssertion<L>;
+  assert: EnumeratedLiteralsAssertion<L>;
   /**
    * A typeguard that returns whether or not the provided value 'v' is in the set of constant string
    * literal values on the {@link EnumeratedLiterals} instance.
    *
    * @param {unknown} v
-   *   The value for which the determination should be made as to whether it is in the set of
-   *   constant string literal values on the {@link EnumeratedLiterals} instance.
+   *   The applicable value that the method should return whether or not it is in the set of
+   *   constant string literals on this {@link EnumeratedLiterals} instance.
    *
-   * @returns {v is LiteralsValue<L>}
-   *   Whether or not the provided value 'v' is in the set of constant string literal values on the
-   *   {@link EnumeratedLiterals} instance.
+   * @returns {boolean} Whether or not the provided value 'v' is in the set of constant string
+   * literal values on the {@link EnumeratedLiterals} instance.
    */
-  readonly contains: (v: unknown) => v is LiteralsValue<L>;
+  contains(v: unknown): v is core.LiteralsValue<L>;
   /**
    * Returns a new {@link EnumeratedLiterals} instance that consists of just the values that are
    * provided to the method.
    */
-  readonly pick: <
-    T extends readonly LiteralsValues<L>[number][],
-    Ot extends EnumeratedLiteralsDynamicOptions<ExtractLiterals<L, T>>,
+  pick<
+    T extends readonly core.LiteralsValues<L>[number][],
+    Ot extends options.EnumeratedLiteralsDynamicOptions<core.ExtractLiterals<L, T>>,
   >(
     vs: T,
     opts: Ot,
-  ) => EnumeratedLiterals<
-    ExtractLiterals<L, T>,
-    OptionsWithNewSet<ExtractLiterals<L, T>, Ot, L, O>
+  ): EnumeratedLiterals<
+    core.ExtractLiterals<L, T>,
+    options.OptionsWithNewSet<core.ExtractLiterals<L, T>, Ot, L, O>
   >;
   /**
    * Returns a new {@link EnumeratedLiterals} instance that consists of just the values on the
-   * instance exluding those that are provided to the method.
+   * instance excluding those that are provided to the method.
    */
-  readonly omit: <
-    T extends readonly LiteralsValues<L>[number][],
-    Ot extends EnumeratedLiteralsDynamicOptions<ExcludeLiterals<L, T>>,
+  omit<
+    T extends readonly core.LiteralsValues<L>[number][],
+    Ot extends options.EnumeratedLiteralsDynamicOptions<core.ExcludeLiterals<L, T>>,
   >(
     vs: T,
     opts: Ot,
-  ) => EnumeratedLiterals<
-    ExcludeLiterals<L, T>,
-    OptionsWithNewSet<ExcludeLiterals<L, T>, Ot, L, O>
+  ): EnumeratedLiterals<
+    core.ExcludeLiterals<L, T>,
+    options.OptionsWithNewSet<core.ExcludeLiterals<L, T>, Ot, L, O>
   >;
   /**
-   * Throws an {@link InvalidLiteralValueError} with a message that is generated based on optionally
-   * provided options to the {@link EnumeratedLiterals} instance on instantiation and the optional
-   * message {@link string} that is provided as the seconda argument to the method.
+   * Throws an {@link errors.InvalidLiteralValueError}.
+   *
+   * The message on the {@link errors.InvalidLiteralValueError} is automatically generated based on
+   * the string literals on the {@link EnumeratedLiterals} instance, but it can be configured with
+   *
+   * - The 'invalidValueErrorMessage' property on the {@link options.EnumeratedLiteralsOptions}.
+   * - The 'errorMessage' argument to this method.
+   *
+   * @param {unknown} v
+   *   The value that is invalid.
+   *
+   * @param {string} errorMessage
+   *   An optional error message that should be included in the thrown
+   *   {@link errors.InvalidLiteralValueError}.
+   *
+   * @throws Always throws an {@link errors.InvalidLiteralValueError}.
    */
-  readonly throwInvalidValue: (v: unknown, errorMessage?: string) => void;
+  throwInvalidValue(v: unknown, errorMessage?: string): void;
 };
