@@ -84,8 +84,6 @@ export const withBaseConfig = (rootDir: string, config: AllowedConfig): Config =
  */
 export const withApplicationConfig = (rootDir: string, projects: string[]) =>
   withBaseConfig(rootDir, {
-    collectCoverage: true,
-    coverageReporters: ["text", "cobertura"],
     projects,
   });
 
