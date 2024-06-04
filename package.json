@@ -44,13 +44,6 @@
     "test:ci": "jest",
     "tsc": "tsc --project ./tsconfig.json"
   },
-  "jest": {
-    "collectCoverage": true,
-    "coverageReporters": [
-      "text",
-      "cobertura"
-    ]
-  },
   "keywords": [
     "literals",
     "enum",
