@@ -14,7 +14,12 @@ export type LiteralsBaseModelArray<V extends string = string> = readonly Literal
 export type Literals = LiteralsArray | LiteralsBaseModelArray;
 
 export const literalsAreModelArray = (literals: Literals): literals is LiteralsBaseModelArray => {
-  if (literals.some(l => isLiteralModel(l))) {
+  if (literals.length === 0) {
+    throw new Error(
+      "The 'enumeratedLiterals' method must be called with a non-empty array as its first " +
+        "argument.",
+    );
+  } else if (literals.some(l => isLiteralModel(l))) {
     if (!literals.every(l => isLiteralModel(l))) {
       throw new Error(
         "Encountered a set of literals that contains a combination of strings and models. " +
@@ -27,7 +32,12 @@ export const literalsAreModelArray = (literals: Literals): literals is LiteralsB
 };
 
 export const literalsAreArray = (literals: Literals): literals is LiteralsArray => {
-  if (literals.some(l => typeof l === "string")) {
+  if (literals.length === 0) {
+    throw new Error(
+      "The 'enumeratedLiterals' method must be called with a non-empty array as its first " +
+        "argument.",
+    );
+  } else if (literals.some(l => typeof l === "string")) {
     if (!literals.every(l => typeof l === "string")) {
       throw new Error(
         "Encountered a set of literals that contains a combination of strings and models. " +
