@@ -302,5 +302,5 @@ export type EnumeratedLiterals<
    *
    * @throws Always throws an {@link errors.InvalidLiteralValueError}.
    */
-  throwInvalidValue(v: unknown, errorMessage?: string): void;
+  throwInvalidValue(v: unknown, errorMessage?: string): never;
 };

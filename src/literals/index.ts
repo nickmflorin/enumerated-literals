@@ -113,7 +113,7 @@ export const enumeratedLiterals = <L extends Literals, O extends EnumeratedLiter
       this.assert(v);
       const found = this.models.find(l => l.value === v);
       if (!found) {
-        this.throwInvalidValue(v);
+        return this.throwInvalidValue(v);
       }
       return found as LiteralsModel<L, V>;
     },

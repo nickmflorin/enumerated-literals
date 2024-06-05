@@ -3,6 +3,10 @@ import { enumeratedLiterals } from "~/literals";
 describe(
   "the literals object is properly attributed with a 'pick' method that " + "properly returns",
   () => {
+    it("the pick() method properly throws when values are not on literals instance", () => {
+      const Literals = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+      expect(() => Literals.pick(["foo" as "apple"], {})).toThrow();
+    });
     describe(
       "the pick() method properly returns when the literals model is " + "instantiated with models",
       () => {
