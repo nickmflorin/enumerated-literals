@@ -7,7 +7,7 @@ describe("the literals object is properly attributed with accessors", () => {
         "explicitly defined",
       () => {
         describe(
-          "the literals object returns the correct values for accessors when no " +
+          "the literals object returns the correct values for accessors when default " +
             "casing is used",
           () => {
             const ACCESSORS = [
@@ -19,6 +19,30 @@ describe("the literals object is properly attributed with accessors", () => {
             const Literals = enumeratedLiterals(
               ["apple", "banana", "blueberry", "orange"] as const,
               {},
+            );
+            test.each(ACCESSORS)("(accessor = %s)", (accessor, value) => {
+              expect(Literals[accessor]).toBe(value);
+            });
+          },
+        );
+        describe(
+          "the literals object returns the correct values for accessors when null " +
+            "casing is used",
+          () => {
+            const ACCESSORS = [
+              ["Apple", "apple"],
+              ["Banana", "banana"],
+              ["Blueberry", "blueberry"],
+              ["Orange", "orange"],
+            ] as const satisfies [string, string][];
+            const Literals = enumeratedLiterals(
+              [
+                { accessor: "Apple", value: "apple" },
+                { accessor: "Banana", value: "banana" },
+                { accessor: "Blueberry", value: "blueberry" },
+                { accessor: "Orange", value: "orange" },
+              ] as const,
+              { accessorCase: null },
             );
             test.each(ACCESSORS)("(accessor = %s)", (accessor, value) => {
               expect(Literals[accessor]).toBe(value);
@@ -189,6 +213,24 @@ describe("the literals object is properly attributed with accessors", () => {
     });
   });
 
+  describe("the literals object throws an error when values are not unique", () => {
+    it("throws an error when instantiated with non unique values", () => {
+      expect(() => enumeratedLiterals(["apple", "apple", "banana"] as const, {})).toThrow(
+        "Encountered duplicate literal values, 'apple'. The literal values must be unique!",
+      );
+    });
+    it("throws an error when instantiated with models with non unique values", () => {
+      expect(() =>
+        enumeratedLiterals(
+          [{ value: "apple" }, { value: "apple" }, { value: "banana" }] as const,
+          {},
+        ),
+      ).toThrow(
+        "Encountered duplicate literal values, 'apple'. The literal values must be unique!",
+      );
+    });
+  });
+
   describe("the literals object throws an error when accessors are not unique", () => {
     it("throws an error when two different values map to the same accessor", () => {
       expect(() => enumeratedLiterals(["foo bar", "foo-bar"] as const, {})).toThrow();
@@ -205,6 +247,43 @@ describe("the literals object is properly attributed with accessors", () => {
             {},
           ),
         ).toThrow();
+      },
+    );
+    it(
+      "throws an error when one explicitly defined accessor maps to the same accessor as one " +
+        "explicitly provided value",
+      () => {
+        expect(() =>
+          enumeratedLiterals(
+            [{ accessor: "foo bar", value: "foobar" }, { value: "foo  bar" }] as const,
+            { accessorCase: "lower", accessorSpaceReplacement: null },
+          ),
+        ).toThrow(
+          "Encountered a value, 'foo  bar', that maps to the same accessor ('foo bar') as the " +
+            "explicitly provided accessor, 'foo bar'. The provided accessors and/or values " +
+            "must all map to unique accessor values. Either provide an explicit accessor value " +
+            "for the value 'foo  bar',change the accessor value 'foo bar'or configure the " +
+            "accessor options such that the two do not map to the same accessor.",
+        );
+      },
+    );
+    // This is the above test in the reverse direction, to test both conditionals.
+    it(
+      "throws an error when one explicitly provided value maps to the same accessor as one " +
+        "explicitly provided accessor",
+      () => {
+        expect(() =>
+          enumeratedLiterals(
+            [{ value: "foo  bar" }, { accessor: "foo bar", value: "foobar" }] as const,
+            { accessorCase: "lower", accessorSpaceReplacement: null },
+          ),
+        ).toThrow(
+          "Encountered a value, 'foo  bar', that maps to the same accessor ('foo bar') as the " +
+            "explicitly provided accessor, 'foo bar'. The provided accessors and/or values must " +
+            "all map to unique accessor values. Either provide an explicit accessor value for " +
+            "the value 'foo  bar',change the accessor value 'foo bar' or configure the accessor " +
+            "options such that the two do not map to the same accessor.",
+        );
       },
     );
     it(

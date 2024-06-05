@@ -5,9 +5,8 @@ export type LiteralsBaseModel<V extends string = string> = {
   readonly accessor?: string;
 };
 
-export const isLiteralModel = <V extends string = string>(
-  v: V | LiteralsBaseModel<V>,
-): v is LiteralsBaseModel<V> => typeof v !== "string" && "value" in v && v.value !== undefined;
+export const isLiteralModel = <V extends string = string>(v: unknown): v is LiteralsBaseModel<V> =>
+  typeof v === "object" && v !== null && "value" in v && v.value !== undefined;
 
 export type LiteralsBaseModelArray<V extends string = string> = readonly LiteralsBaseModel<V>[];
 

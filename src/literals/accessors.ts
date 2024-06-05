@@ -41,7 +41,7 @@ export type FormatAccessorCase<
         ? S
         : never;
 
-export type AccessorSpaceReplacement = "_" | "-" | "";
+export type AccessorSpaceReplacement = "_" | "-" | "" | null;
 
 export type ParseAccessorSpaceReplacement<
   L extends Literals,
@@ -72,7 +72,9 @@ export type FormatAccessorSpaces<
       ? ReplaceSpacesWith<S, "-">
       : ParseAccessorSpaceReplacement<L, O> extends ""
         ? ReplaceSpacesWith<S, "">
-        : never;
+        : ParseAccessorSpaceReplacement<L, O> extends null
+          ? S
+          : never;
 
 export type AccessorHyphenReplacement = "_" | "" | null;
 
@@ -207,10 +209,12 @@ export const toLiteralAccessor = <
   } else if (opts.accessorCase === "lower") {
     accessor = accessor.toLowerCase();
   }
-  if (opts.accessorHyphenReplacement) {
+  if (opts.accessorHyphenReplacement !== null) {
     accessor = accessor.replaceAll("-", opts.accessorHyphenReplacement);
   }
-  accessor = accessor.replaceAll(" ", opts.accessorSpaceReplacement);
+  if (opts.accessorSpaceReplacement !== null) {
+    accessor = accessor.replaceAll(" ", opts.accessorSpaceReplacement);
+  }
   return accessor as LiteralsAccessor<V, L, O>;
 };
 
@@ -274,7 +278,7 @@ export const parseAccessors = <L extends Literals, O extends EnumeratedLiteralsO
           throw new Error(
             `Encountered a value, '${derivation.raw}', that maps to the same accessor ` +
               `('${derivation.accessor}') as ` +
-              `the explicitly provided accessor, '${existingDerivation.raw}'.` +
+              `the explicitly provided accessor, '${existingDerivation.raw}'. ` +
               "The provided accessors and/or values must all map to unique accessor values. " +
               `Either provide an explicit accessor value for the value '${derivation.raw}',` +
               `change the accessor value '${existingDerivation.accessor}'` +
@@ -285,7 +289,7 @@ export const parseAccessors = <L extends Literals, O extends EnumeratedLiteralsO
           throw new Error(
             `Encountered a value, '${existingDerivation.raw}', that maps to the same ` +
               `accessor ('${derivation.accessor}') as ` +
-              `the explicitly provided accessor, '${derivation.raw}'.` +
+              `the explicitly provided accessor, '${derivation.raw}'. ` +
               "The provided accessors and/or values must all map to unique accessor values. " +
               `Either provide an explicit accessor value for the value '${existingDerivation.raw}',` +
               `change the accessor value '${derivation.accessor}' ` +

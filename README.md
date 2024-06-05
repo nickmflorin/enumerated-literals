@@ -361,7 +361,7 @@ The optional options that can be provided to the `enumeratedLiterals` method are
    });
    ```
 
-2. **`accessorSpaceReplacement`** (`AccessorSpaceReplacement` or `"_" | "-" | ""`)
+2. **`accessorSpaceReplacement`** (`AccessorSpaceReplacement` or `"_" | "-" | "" | null`)
 
    The `string` value that will be used to replace single white-space characters when the accessors
    are either auto-generated based on the constant string literal values on the
@@ -380,18 +380,24 @@ The optional options that can be provided to the `enumeratedLiterals` method are
    Fruits["YELLOW-BANANA"]; // "yellow banana"
    ```
 
-   Note that multiple white-space characters encountered in the middle of a value or accessor will
-   be replaced with single white-space characters:
+   It is important to note the following:
 
-   ###### Example
+   1. Multiple white-space characters encountered in the middle of a value or accessor will be
+      replaced with single white-space characters:
 
-   ```ts
-   const Fruits = enumeratedLiterals(["red    apple"] as const, {
-     accessorSpaceReplacement: "_",
-   });
+      ###### Example
 
-   Fruits.RED_APPLE; // "red    apple"
-   ```
+      ```ts
+      const Fruits = enumeratedLiterals(["red    apple"] as const, {
+        accessorSpaceReplacement: "_",
+      });
+
+      Fruits.RED_APPLE; // "red    apple"
+      ```
+
+   2. A `null` value means that white-space characters will remain and will not be replaced.
+      However, if multiple consecutive white-space characters are encountered, they will still be
+      replaced with a single white-space character.
 
    Default: `"_"`
 
