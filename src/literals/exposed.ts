@@ -105,12 +105,13 @@ export interface IEnumeratedLiteralsBase<
    */
   readonly members: core.LiteralsMembers<L>;
   /**
-   * The {@link object}(s) associated with each member of the {@link EnumeratedLiterals} instance.
+   * The {@link object}(s) associated with each {@link EnumeratedLiteralsMember} of the
+   * {@link EnumeratedLiterals} instance.
    */
   readonly models: core.LiteralsModels<L>;
   /**
-   * Returns a human readable string representing the members associated with the
-   * {@link EnumeratedLiterals} instance.
+   * Returns a human readable string representing the {@link EnumeratedLiteralsMember}(s)
+   * associated with the {@link EnumeratedLiterals} instance.
    *
    * @example
    * ```ts
@@ -124,8 +125,8 @@ export interface IEnumeratedLiteralsBase<
    * @param {HumanizeListOptions<string>} options
    *   Options that can be used to customize the humanized string.
    *
-   * @returns {string} A human readable representation of the values on the
-   * {@link EnumeratedLiterals} instance.
+   * @returns {string} A human readable representation of the {@link EnumeratedLiteralsMember}(s)
+   * on the {@link EnumeratedLiterals} instance.
    */
   humanize(options?: HumanizeListOptions<string>): string;
   /**
@@ -221,11 +222,9 @@ export interface IEnumeratedLiteralsBase<
    */
   getModelSafe: GetModelSafe<L>;
   /**
-   * Returns the provided value typed as a member of the {@link EnumeratedLiterals} instance,
-   * {@link core.LiteralsMember<V>}, if the value is indeed a member of the
-   * {@link EnumeratedLiterals} instance.
-   *
-   * Otherwise, the method will throw an {@link errors.InvalidLiteralValueError}.
+   * Validates and returns the provided value or values as a {@link EnumeratedLiteralsMember} or
+   * {@link EnumeratedLiteralsMember}(s) of the {@link EnumeratedLiterals} instance, respectively.
+   * The specific behavior of the method depends on the options that it accepts:
    *
    * @see ParseOptions
    * @see ParseReturn
@@ -236,13 +235,15 @@ export interface IEnumeratedLiteralsBase<
    * @param {ParseOptions} options
    *   Options that define the behavior of the method:
    *
-   * @throws An {@link errors.InvalidLiteralValueError} 'strict' and either the provided value is
-   * not a member of the {@link EnumeratedLiterals} instance or any of the values in the provided
-   * array are not members of the {@link EnumeratedLiterals} instance.
+   * @throws An {@link errors.InvalidLiteralValueError} if the 'strict' is not 'false' and either
+   * the provided value is not a {@link EnumeratedLiteralsMember} of the {@link EnumeratedLiterals}
+   * instance or any of the values in the provided array are not {@link EnumeratedLiteralsMember}(s)
+   * of the {@link EnumeratedLiterals} instance.
    *
-   * @returns {ParseReturn<L, O>} Either the provided value typed as member of the
-   * {@link EnumeratedLiterals} instance, or the values in the provided array that are members of
-   * the {@link EnumeratedLiterals} instance.
+   * @returns {ParseReturn<L, O>} Either the provided value typed as
+   * {@link EnumeratedLiteralsMember} of the {@link EnumeratedLiterals} instance, or the values in
+   * the provided array that are {@link EnumeratedLiteralsMember}(s) of the
+   * {@link EnumeratedLiterals} instance.
    */
   parse<O extends ParseOptions>(v: ParseArg<O>, options: O): ParseReturn<L, O>;
   /**
