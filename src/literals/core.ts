@@ -48,7 +48,7 @@ export const literalsAreArray = (literals: Literals): literals is LiteralsArray 
   return false;
 };
 
-export type LiteralsValue<L extends Literals> = L extends LiteralsArray
+export type LiteralsMember<L extends Literals> = L extends LiteralsArray
   ? L[number]
   : L extends LiteralsBaseModelArray
     ? L[number]["value"]
@@ -70,10 +70,23 @@ export type LiteralsArrayModels<L extends readonly string[]> = L extends readonl
     ? readonly [{ value: Li }, ...LiteralsArrayModels<R>]
     : never;
 
-export type LiteralsValues<L extends Literals> = L extends LiteralsArray
+export type LiteralsMembers<L extends Literals> = L extends LiteralsArray
   ? L
   : L extends LiteralsBaseModelArray
     ? LiteralsBaseModelArrayValues<L>
+    : never;
+
+export type LiteralsModel<
+  L extends Literals,
+  V extends LiteralsMember<L> = LiteralsMember<L>,
+> = L extends LiteralsArray
+  ? V extends LiteralsMember<L>
+    ? { value: V }
+    : never
+  : L extends LiteralsBaseModelArray
+    ? V extends LiteralsMember<L>
+      ? Extract<L[number], { value: V }>
+      : never
     : never;
 
 export type LiteralsModelAttributeName<L extends Literals> = L extends LiteralsArray
@@ -108,7 +121,7 @@ export type LiteralsAttributeValues<
 
 export type LiteralsAttributeValue<
   L extends Literals,
-  V extends LiteralsValue<L>,
+  V extends LiteralsMember<L>,
   N extends LiteralsModelAttributeName<L>,
 > = L extends LiteralsBaseModelArray
   ? Extract<L[number], { value: V }>[N]
@@ -122,7 +135,7 @@ export type LiteralsModels<L extends Literals> = L extends LiteralsArray
 
 export type ExtractLiteralsFromModelArray<
   L extends LiteralsBaseModelArray,
-  I extends readonly LiteralsValues<L>[number][],
+  I extends readonly LiteralsMembers<L>[number][],
 > = L extends readonly [infer Li extends LiteralsBaseModel]
   ? Li["value"] extends I[number]
     ? readonly [Li]
@@ -135,7 +148,7 @@ export type ExtractLiteralsFromModelArray<
 
 export type ExtractLiteralsFromArray<
   L extends LiteralsArray,
-  I extends readonly LiteralsValues<L>[number][],
+  I extends readonly LiteralsMembers<L>[number][],
 > = L extends readonly [infer Li extends string]
   ? Li extends I[number]
     ? readonly [Li]
@@ -148,7 +161,7 @@ export type ExtractLiteralsFromArray<
 
 export type ExtractLiterals<
   L extends Literals,
-  I extends readonly LiteralsValues<L>[number][],
+  I extends readonly LiteralsMembers<L>[number][],
 > = L extends LiteralsArray
   ? ExtractLiteralsFromArray<L, I>
   : L extends LiteralsBaseModelArray
@@ -157,7 +170,7 @@ export type ExtractLiterals<
 
 export type ExcludeLiteralsFromModelArray<
   L extends LiteralsBaseModelArray,
-  I extends readonly LiteralsValues<L>[number][],
+  I extends readonly LiteralsMembers<L>[number][],
 > = L extends readonly [infer Li extends LiteralsBaseModel]
   ? Li["value"] extends I[number]
     ? readonly []
@@ -170,7 +183,7 @@ export type ExcludeLiteralsFromModelArray<
 
 export type ExcludeLiteralsFromArray<
   L extends LiteralsArray,
-  I extends readonly LiteralsValues<L>[number][],
+  I extends readonly LiteralsMembers<L>[number][],
 > = L extends readonly [infer Li extends string]
   ? Li extends I[number]
     ? readonly []
@@ -183,7 +196,7 @@ export type ExcludeLiteralsFromArray<
 
 export type ExcludeLiterals<
   L extends Literals,
-  I extends readonly LiteralsValues<L>[number][],
+  I extends readonly LiteralsMembers<L>[number][],
 > = L extends LiteralsArray
   ? ExcludeLiteralsFromArray<L, I>
   : L extends LiteralsBaseModelArray

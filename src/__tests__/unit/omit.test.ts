@@ -28,7 +28,7 @@ describe(
         const SubsetLiterals = Literals.omit(["banana", "orange"], {});
 
         it("returns an object with the correct values", () => {
-          expect(SubsetLiterals.values).toEqual(["apple", "blueberry"]);
+          expect(SubsetLiterals.members).toEqual(["apple", "blueberry"]);
         });
 
         it("returns an object with the correct accessors", () => {
@@ -81,7 +81,7 @@ describe(
         const SubsetLiterals = Literals.omit(["banana", "orange"] as const, {});
 
         it("returns an object with the correct values", () => {
-          expect(SubsetLiterals.values).toEqual(["ap-ple", "blue berry"]);
+          expect(SubsetLiterals.members).toEqual(["ap-ple", "blue berry"]);
         });
 
         it("returns an object with the correct accessors", () => {

@@ -6,11 +6,11 @@ import {
 import {
   type Literals,
   type LiteralsBaseModelArray,
-  type LiteralsValues,
   type LiteralsArray,
   literalsAreArray,
   literalsAreModelArray,
 } from "./core";
+import { type EnumeratedLiteralsInvalidValueErrorMessage } from "./errors";
 
 export type DefaultAccessorOptions<L extends Literals> = L extends LiteralsArray
   ? {
@@ -55,11 +55,6 @@ export const getDefaultLiteralsAccessorOptions = <L extends Literals>(
   }
   throw new Error("Unreachable code path!");
 };
-
-export type EnumeratedLiteralsInvalidValueErrorMessage<L extends Literals> = (
-  values: LiteralsValues<L>,
-  value: unknown,
-) => string;
 
 export type EnumeratedLiteralsDynamicOptions<L extends Literals> = Partial<{
   readonly invalidValueErrorMessage: EnumeratedLiteralsInvalidValueErrorMessage<L>;

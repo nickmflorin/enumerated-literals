@@ -142,14 +142,21 @@ export type EnumeratedLiteralsArrayAccessors<
   [key in L[number] as key extends string ? LiteralsAccessor<key, L, O> : never]: key;
 };
 
+type EnumeratedLiteralsAccessorKey<L extends Literals> = L extends readonly (infer Li extends
+  string)[]
+  ? Li
+  : L extends readonly (infer Li)[]
+    ? Li extends { accessor: infer A extends string }
+      ? A
+      : never
+    : never;
+
 export type EnumeratedLiteralsAccessors<
   L extends Literals,
   O extends EnumeratedLiteralsOptions<L>,
-> = L extends LiteralsArray
-  ? EnumeratedLiteralsArrayAccessors<L, O>
-  : L extends LiteralsBaseModelArray
-    ? EnumeratedLiteralsBaseModelArrayAccessors<L, O>
-    : never;
+> = {
+  [key in EnumeratedLiteralsAccessorKey<L> as LiteralsAccessor<key, L, O>]: key;
+};
 
 const AccessorRegex = /^[A-Za-z0-9-_\s]*$/;
 

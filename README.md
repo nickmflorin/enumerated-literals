@@ -13,7 +13,7 @@ $ npm install enumerated-literals
 ## Basics
 
 At it's core, the `enumerated-literals` package provides a method, `enumeratedLiterals`, that can be
-used to define and group constant string literals in an `enum`-like fashion:
+used to define a set of constant string literals in an `enum`-like fashion:
 
 ```ts
 enumeratedLiterals<L extends Literals, O extends EnumeratedLiteralsOptions<L>>(literals: L, options: O): EnumeratedLiterals<L, O>
@@ -21,10 +21,11 @@ enumeratedLiterals<L extends Literals, O extends EnumeratedLiteralsOptions<L>>(l
 
 The first argument to the `enumeratedLiterals` method, `L` (or `Literals`), should be a `const`
 (`readonly`) array of `string` values (`string[]`) or `object` values, each of which contains a
-`value` key (`{ value: string }`[]). The second argument provided to the `enumeratedLiterals`
-method, `O` (or [`EnumeratedLiteralsOptions<L>`][EnumeratedLiteralsOptions]), should be an `object`
-type that contains the options for the instance (see
-[Configuration Options](#configuration-options)).
+`value` key (`{ value: string }`[]) (see [`EnumeratedLiterals` models][model]).
+
+The second argument provided to the `enumeratedLiterals` method, `O` (or
+[`EnumeratedLiteralsOptions<L>`][EnumeratedLiteralsOptions]), should be an `object` type that
+contains the options for the instance (see [Configuration Options](#configuration-options)).
 
 ###### Example
 
@@ -32,7 +33,7 @@ type that contains the options for the instance (see
 import { enumeratedLiterals, type EnumeratedLiteralsType } from "enumerated-literals";
 
 const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
-type Fruit = EnumeratedLiteralType<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
+type Fruit = EnumeratedLiteralMember<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
 
 Fruits.APPLE; // Typed as "apple"
 Fruits.BANANA; // Typed as "banana"
@@ -67,88 +68,112 @@ it requires also importing `Fruits`. While this might seem like a small inconven
 inflexibility can be a pain point in larger applications with a significant number of constants
 defined in `enum` fashion.
 
-Additionally, the [`EnumeratedLiterals`][EnumeratedLiterals] instance offers built-in type-checking
-methods and strongly typed properties, which provide a more convenient and organized way of making
-assertions and type-checking values related to the constant string literals the instance is
-associated with (see [Built-In Type Checking](#built-in-type-checking)).
+Additionally, the [EnumeratedLiterals Instance] offers built-in type-checking methods and strongly typed
+properties, which provide a more convenient and organized way of making assertions and type-checking
+values related to the constant string literals the instance is associated with (see [Built-In Type Checking](#built-in-type-checking)).
 
 ## Terminology
 
 The following terms will be referenced throughout this documentation:
 
-1. **The [`EnumeratedLiterals`][EnumeratedLiterals] Instance**:
+#### The [`EnumeratedLiterals`][EnumeratedLiterals] Instance
 
-   The `object` that is created and returned by the `enumeratedLiterals` method (e.g. `Fruits`).
-
-   ```ts
-   const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
-   ```
-
-2. **The [`EnumeratedLiterals`][EnumeratedLiterals] Values**:
-
-   The constant string literal values that the [`EnumeratedLiterals`][EnumeratedLiterals] instance
-   contains (e.g. `"apple"`, `"banana"`, `"blueberry"`, `"orange"`).
-
-   ```ts
-   Fruits.values; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
-   ```
-
-3. **The [`EnumeratedLiterals`][EnumeratedLiterals] Models**:
-
-   The `object`(s) associated with each [`EnumeratedLiterals`][EnumeratedLiterals] value on the
-   [`EnumeratedLiterals`][EnumeratedLiterals] instance. Each object contains the relevant
-   [`EnumeratedLiterals`][EnumeratedLiterals] value, indexed by the `value` key, along with
-   additional key-value pairs that are associated with each value when provided on instantiation of
-   the instance: `"banana"`, `"blueberry"`, `"orange"`).
-
-   ```ts
-   // Typed as readonly [ { value: "apple" }, { value: "banana" }, { value: "blueberry" }, { value: "orange" }]
-   Fruits.models;
-   ```
-
-4. **The [`EnumeratedLiterals`][EnumeratedLiterals] Accessors**:
-
-   The properties of the [`EnumeratedLiterals`][EnumeratedLiterals] instance that are used to access
-   the [`EnumeratedLiterals`][EnumeratedLiterals] values on the instance (e.g. `APPLE` or `BANANA`).
-
-   ```ts
-   Fruits.APPLE; // Typed as "apple"
-   ```
-
-## Usage
-
-The following describes how the `enumerated-literals` package can be used and the various features
-it offers.
-
-### Basic Usage
-
-In its most basic form, an [`EnumeratedLiterals`][EnumeratedLiterals] instance can be created as
-follows:
+The `object` that is created and returned by the `enumeratedLiterals` method (e.g. `Fruits`):
 
 ```ts
 const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
-type Fruit = EnumeratedLiteralType<typeof Fruits>;
 ```
 
-The constant string literals, `"apple"`, `"banana"`, `"blueberry"`, and `"orange"` can be accessed
-as properties of the `Fruits` object:
+#### The `EnumeratedLiterals` Members
+
+The constant string literal values that the [EnumeratedLiterals Instance] contains (e.g. `"apple"`, `"banana"`,
+`"blueberry"`, `"orange"`):
 
 ```ts
-Fruits.APPLE; // Typed as "apple"
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+Fruits.members; // readonly ["apple", "banana", "blueberry", "orange"]
 ```
 
-The constant string literal values on the [`EnumeratedLiterals`][EnumeratedLiterals] instance can be
-accessed as a `readonly` array as follows:
+The members of the [EnumeratedLiterals Instance] will always be a `readonly` array of `string`(s), even
+when the [`EnumeratedLiterals`][EnumeratedLiterals] instance is created with a series of models:
 
 ```ts
-Fruits.values; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
+const Fruits = enumeratedLiterals(
+  [
+    { value: "apple", label: "Apple" },
+    { value: "banana", label: "Banana" },
+    { value: "blueberry", label: "Blueberry" },
+    { value: "orange", label: "Orange" },
+  ] as const,
+  {},
+);
+
+Fruits.members; // readonly ["apple", "banana", "blueberry", "orange"]
 ```
 
-#### Custom Accessors
+The type of the [members][member] on an [`EnumeratedLiterals`][instance] can be obtained via the
+`EnumeratedLiteralsType` generic type:
 
-The attributes that are used to access the constant string literal values (termed `accessors`) can
-be customized by defining an `accessor` property for each `value` corresponding to a constant string
-literal in the set:
+```ts
+// "apple" | "banana" | "blueberry" | "orange"
+type Fruit = EnumeratedLiteralMember<typeof Fruits>;
+```
+
+#### The `EnumeratedLiterals` Models
+
+The `object`(s) associated with each member on the [`EnumeratedLiterals`][instance] instance:
+
+```ts
+const Fruits = enumeratedLiterals(
+  [
+    { value: "apple", label: "Apple" },
+    { value: "banana", label: "Banana" },
+    { value: "blueberry", label: "Blueberry" },
+    { value: "orange", label: "Orange" },
+  ] as const,
+  {},
+);
+
+// [ { value: "apple", label: "Apple" }, { value: "banana", label: "Banana" }, ... ]
+Fruits.models;
+```
+
+If the [EnumeratedLiterals Instance] is created with a `readonly` array of `string`(s), the models will
+simply be an array of `object`(s) with a `value` key:
+
+```ts
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+// [ { value: "apple" }, { value: "banana" }, ... ]
+Fruits.models;
+```
+
+The type of the `object`(s) on an [EnumeratedLiterals][instance] instance can be obtained via the
+`EnumeratedLiteralsModel` generic type:
+
+```ts
+// { value: "apple", label: "Apple" } | { value: "banana", label: "Banana" } | ...
+type FruitModel = EnumeratedLiteralsModel<typeof Fruits>;
+```
+
+#### The `EnumeratedLiterals` Accessors
+
+The properties of the [EnumeratedLiterals][instance] instance that are used to access the
+[members][member] on the [`EnumeratedLiterals`][instance] instance (e.g. `APPLE` or `BANANA`).
+
+```ts
+Fruits.APPLE; // "apple"
+const b: "banana" = Fruits.BANANA;
+```
+
+The [accessors][accessor] on an [EnumeratedLiterals][instance] are automatically generated based on
+the corresponding [members][member] of the instance. The manner in which the [accessors][accessor]
+are generated can be customized
+
+##### Custom Accessors
+
+The manner in which the [accessors][accessor] are generated can be customized by providing specific
+[Configuration Options](#configuration-options) to the `enumeratedLiterals` method or by explicitly
+defining the [accessors][accessor] for each [member][member] on the [EnumeratedLiterals][instance]:
 
 ```ts
 const Fruits = enumeratedLiterals(
@@ -162,28 +187,68 @@ const Fruits = enumeratedLiterals(
 );
 
 Fruits.Apple; // Typed as "apple"
-Fruits.values; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
+Fruits.members; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
+```
+
+## Usage
+
+The following describes how the `enumerated-literals` package can be used and the various features
+it offers.
+
+### Basic Usage
+
+In its most basic form, an [EnumeratedLiterals][instance] instance can be created as follows:
+
+```ts
+const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
+type Fruit = EnumeratedLiteralMember<typeof Fruits>;
+```
+
+The constant string literals, `"apple"`, `"banana"`, `"blueberry"`, and `"orange"` (or members of
+the [EnumeratedLiterals][instance] instance) can be accessed as properties of the `Fruits` object
+via their associated accessors:
+
+```ts
+Fruits.APPLE; // Typed as "apple"
+```
+
+The constant string literal values on the [EnumeratedLiterals][instance] instance can be accessed as
+a `readonly` array as follows:
+
+```ts
+Fruits.members; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
 ```
 
 #### Built-In Type Checking
 
-An [`EnumeratedLiterals`][EnumeratedLiterals] instance is equipped with the following methods that
-are useful for type checking:
+The [EnumeratedLiterals][instance] instance is equipped with the following methods that are useful
+for type checking:
 
 ##### Assertion
 
-The `assert` method will throw an error if the value that it is provided is not in the set of
-constant string literals defined on the [`EnumeratedLiterals`][EnumeratedLiterals] instance:
+The `assert` method will throw an `InvalidLiteralValueError` if the value that it is provided is not
+in the set of constant string literals defined on the [`EnumeratedLiterals`][EnumeratedLiterals]
+instance:
 
 ```ts
 Fruits.assert("cucumber"); // throws an InvalidLiteralValueError
 ```
 
+###### Handling Multiple Values
+
+The [`EnumeratedLiterals`][EnumeratedLiterals] is also equipped with an `assertMultiple` method that
+will throw an `InvalidLiteralValueError` if _any_ of the values in the provided array are not in the
+set of constant string literals defined on the [EnumeratedLiterals][instance] instance:
+
+```ts
+Fruits.assertMultiple(["cucumber", "pear"]); // throws an InvalidLiteralValueError
+```
+
 ##### Type Guard
 
-The [`EnumeratedLiterals`][EnumeratedLiterals] instance is equipped with a typeguard that returns
-whether or not the provided value is in the set of constant string literals defined on the
-[`EnumeratedLiterals`][EnumeratedLiterals] instance:
+The [EnumeratedLiterals][instance] instance is equipped with a typeguard that returns whether or not
+the provided value is in the set of constant string literals defined on the [EnumeratedLiterals
+instance][instance]:
 
 ```ts
 function processFruit(fruit: Fruit) { ... }
@@ -196,19 +261,54 @@ function process(value: unknown) {
 }
 ```
 
+###### Handling Multiple Values
+
+The [`EnumeratedLiterals`][EnumeratedLiterals] is also equipped with a `containsMultiple` typeguard
+that returns whether or not _all_ of the provided values are in the set of constant string literals
+defined on the [EnumeratedLiterals][instance] instance:
+
+```ts
+function processFruits(fruit: Fruit[]) { ... }
+
+function process(values: string[]) {
+  if (Fruits.containsMultiple(values)) {
+    // 'value' is of type 'Fruit[]'
+    processFruits(values);
+  }
+}
+```
+
 ##### Parser
 
-The `parse` method will return the provided value, typed as a value of the
-[`EnumeratedLiterals`][EnumeratedLiterals] instance, if the value is in the set of constant string
-literals defined on the [`EnumeratedLiterals`][EnumeratedLiterals] instance. Otherwise, it will
-throw an error:
+The `parse` method will return the provided value, typed as a value associated with the constant
+string literals on the [EnumeratedLiterals][instance] instance, if the provided value is in fact in
+the set of constant string literals defined on the [EnumeratedLiterals][instance] instance.
+Otherwise, it will throw an `InvalidLiteralsValueError`:
 
 ```ts
 function processFruit(fruit: Fruit) { ... }
 
 function process(value: unknown) {
-  const f = Fruits.parse(value);
+  // The 'parse' method will throw if the 'value' is not of type 'Fruit'.
+  const f = Fruits.parse(value, {});
   processFruit(f);
+}
+```
+
+###### Handling Multiple Values
+
+The `parse` method can also be used to parse multiple values at once. It will throw an
+`InvalidLiteralsValueError` if _any_ of the provided values are not in the set of constant string
+literals defined on the [EnumeratedLiterals][instance] instance, otherwise it will return the parsed
+values typed as members of the set of constant string literals:
+
+```ts
+function processFruits(fruit: Fruit[]) { ... }
+
+function process(values: string[]) {
+  // The 'parse' method will throw if any of the values in 'value' are not of type 'Fruit'.
+  const f = Fruits.parse(value, { multi: true });
+  processFruits(f);
 }
 ```
 
@@ -216,10 +316,10 @@ function process(value: unknown) {
 
 #### [`EnumeratedLiterals`][EnumeratedLiterals] Model
 
-An [`EnumeratedLiterals`][EnumeratedLiterals] instance can be instantiated such that the constant
-string literal values it contains are associated with other values, constants and/or functions.
-These other values, constants and/or functions will be tied to each value of the
-[`EnumeratedLiterals`][EnumeratedLiterals] instance in a strongly typed fashion:
+An [EnumeratedLiterals][instance] instance can be instantiated such that the constant string literal
+values it contains are associated with other values, constants and/or functions. These other values,
+constants and/or functions will be tied to each value of the [EnumeratedLiterals][instance] instance
+in a strongly typed fashion:
 
 ```ts
 const Fruits = enumeratedLiterals(
@@ -232,7 +332,7 @@ const Fruits = enumeratedLiterals(
   {},
 );
 
-Fruits.values; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
+Fruits.members; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
 /* Typed as readonly [
   { value: "apple"; description: "A red fruit"; color: "red"; label: "Apple"; },
   { value: "banana"; description: "A yellow fruit"; color: "yellow"; label: "Banana"; },
@@ -249,11 +349,10 @@ the `values` that were used to instantiate the instance.
 ##### The `EnumeratedLiteralsModel` Type
 
 The `EnumeratedLiteralsModel` type can be used to type the `models` that are contained on an
-[`EnumeratedLiterals`][EnumeratedLiterals] instance.
+[EnumeratedLiterals][instance] instance.
 
-One common use case is to define a type for both the `value` and `model` of an
-[`EnumeratedLiterals`][EnumeratedLiterals] instance, separately, and allow the `model` to be
-extracted based on the `value`:
+One common use case is to define a type for both the `value` and `model` of an [EnumeratedLiterals
+instance][instance], separately, and allow the `model` to be extracted based on the `value`:
 
 ```ts
 // "apple" | "banana" | "blueberry" | "orange"
@@ -276,15 +375,15 @@ type AnyFruit = Fruit;
 type Apple = Fruit<"apple">;
 ```
 
-An [`EnumeratedLiterals`][EnumeratedLiterals] instance is equipped with the following methods that
-can be used to interact with the [`EnumeratedLiterals`][EnumeratedLiterals] models:
+An [EnumeratedLiterals][instance] instance is equipped with the following methods that can be used
+to interact with the [`EnumeratedLiterals`][EnumeratedLiterals] models:
 
 ##### Model Getters
 
-The [`EnumeratedLiterals`][EnumeratedLiterals] instance is equipped with a method, `getModel`, that
-can be used to retrieve the model associated with a specific value on the
-[`EnumeratedLiterals`][EnumeratedLiterals] instance. The return type will be strongly typed, such
-that the properties associated with the provided value will be their constant representations:
+The [EnumeratedLiterals][instance] instance is equipped with a method, `getModel`, that can be used
+to retrieve the model associated with a specific value on the [EnumeratedLiterals
+instance][instance]. The return type will be strongly typed, such that the properties associated
+with the provided value will be their constant representations:
 
 ```ts
 // { value: "apple"; description: "A red fruit"; color: "red"; label: "Apple"; }
@@ -300,10 +399,10 @@ The arguments to the methods are all strongly typed, such that the following cod
 Fruits.getModel("cucumber");
 ```
 
-Similarly, [`EnumeratedLiterals`][EnumeratedLiterals] instance is equipped with a `getModelSafe`
-method, that allows whether or not an [`InvalidLiteralValueError`][InvalidLiteralValueError] should
-be thrown in the case that the value provided is not in the set of constant string literals on the
-instance or the method should simply return `null` to be controlled via a `strict` option:
+Similarly, [EnumeratedLiterals][instance] instance is equipped with a `getModelSafe` method, that
+allows whether or not an [`InvalidLiteralValueError`][InvalidLiteralValueError] should be thrown in
+the case that the value provided is not in the set of constant string literals on the instance or
+the method should simply return `null` to be controlled via a `strict` option:
 
 ```ts
 Fruits.getModelSafe("cucumber", { strict: true }); // Throws Error, but compiles
@@ -315,9 +414,9 @@ Fruits.getModelSafe("cucumber", { strict: false }); // Compiles, returns the mod
 
 ##### Attribute Getters
 
-The [`EnumeratedLiterals`][EnumeratedLiterals] instance is equipped with a methods, `getAttribute`
-and `getAttributes`, that can be used to access the attributes of a single model or all models on
-the [`EnumeratedLiterals`][EnumeratedLiterals] instance, respectively:
+The [EnumeratedLiterals][instance] instance is equipped with a methods, `getAttribute` and
+`getAttributes`, that can be used to access the attributes of a single model or all models on the
+[EnumeratedLiterals][instance] instance, respectively:
 
 ```ts
 Fruits.getAttribute("apple", "description"); // Typed as "A red fruit"
@@ -330,8 +429,8 @@ Fruits.getAttribute("cucumber", "description");
 ```
 
 The `getAttributes` method can be used to return the associated attribute of all models on the
-[`EnumeratedLiterals`][EnumeratedLiterals] instance, in the same order as the `values` that were
-used to instantiate the instance:
+[EnumeratedLiterals][instance] instance, in the same order as the `values` that were used to
+instantiate the instance:
 
 ```ts
 // Typed as readonly ["A red fruit", "A yellow fruit", "A blue fruit", "An orange fruit"]
@@ -350,24 +449,23 @@ The optional options that can be provided to the `enumeratedLiterals` method are
 
    A function that can be used to format the error message for the
    [`InvalidLiteralValueError`][InvalidLiteralValueError] that is thrown when an invalid value is
-   encountered by the [`EnumeratedLiterals`][EnumeratedLiterals] instance.
+   encountered by the [EnumeratedLiterals][instance] instance.
 
    ###### Example
 
    ```ts
    const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {
-     invalidValueErrorMessage: (values, value) =>
-       `The value '${value}' is not in the set of fruits: ${values.join(", ")}!`,
+     invalidValueErrorMessage: ({ expected, received }) =>
+       `The value '${received[0]}' is not in the set of fruits: ${expected.join(", ")}!`,
    });
    ```
 
 2. **`accessorSpaceReplacement`** (`AccessorSpaceReplacement` or `"_" | "-" | "" | null`)
 
    The `string` value that will be used to replace single white-space characters when the accessors
-   are either auto-generated based on the constant string literal values on the
-   [`EnumeratedLiterals`][EnumeratedLiterals] instance or when white-space characters are
-   encountered in the `accessor` property of a given `object` provided to the `enumeratedLiterals`
-   method:
+   are either auto-generated based on the constant string literal values on the [EnumeratedLiterals
+   instance][instance] or when white-space characters are encountered in the `accessor` property of
+   a given `object` provided to the `enumeratedLiterals` method:
 
    ###### Example
 
@@ -404,9 +502,9 @@ The optional options that can be provided to the `enumeratedLiterals` method are
 3. **`accessorHyphenReplacement`** (`AccessorHyphenReplacement` or `"_" | "" | null`)
 
    The `string` value that will be used to replace hyphens (`"-"`) when the accessors are either
-   auto-generated based on the constant string literal values on the
-   [`EnumeratedLiterals`][EnumeratedLiterals] instance or when hyphen characters are encountered in
-   the `accessor` property of a given `object` provided to the `enumeratedLiterals` method:
+   auto-generated based on the constant string literal values on the [EnumeratedLiterals
+   instance][instance] or when hyphen characters are encountered in the `accessor` property of a
+   given `object` provided to the `enumeratedLiterals` method:
 
    ###### Example
 
@@ -428,9 +526,8 @@ The optional options that can be provided to the `enumeratedLiterals` method are
 
    Whether the accessors should be formatted as lowercase strings, uppercase strings, or neither
    (`null`), when the accessors are either auto-generated based on the constant string literal
-   values on the [`EnumeratedLiterals`][EnumeratedLiterals] instance or when hyphen characters are
-   encountered in the `accessor` property of a given `object` provided to the `enumeratedLiterals`
-   method:
+   values on the [EnumeratedLiterals][instance] instance or when hyphen characters are encountered
+   in the `accessor` property of a given `object` provided to the `enumeratedLiterals` method:
 
    ###### Example
 
@@ -448,17 +545,17 @@ The optional options that can be provided to the `enumeratedLiterals` method are
 
 ## API
 
-The following section describes the methods and properties on an
-[`EnumeratedLiterals`][EnumeratedLiterals] instance.
+The following section describes the methods and properties on an [EnumeratedLiterals
+instance][instance].
 
 #### Instance Properties
 
 ##### `values` (_property_)
 
-The constant string literal values on the [`EnumeratedLiterals`][EnumeratedLiterals] instance.
+The constant string literal values on the [EnumeratedLiterals][instance] instance.
 
 ```ts
-LiteralsValues<L>;
+LiteralsMembers<L>;
 ```
 
 ###### Example
@@ -467,7 +564,7 @@ LiteralsValues<L>;
 import { enumeratedLiterals } from "enumerated-literals";
 
 const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
-Fruits.values; // readonly ["apple", "banana", "blueberry", "orange"]
+Fruits.members; // readonly ["apple", "banana", "blueberry", "orange"]
 
 // or
 
@@ -481,7 +578,7 @@ const Fruits = enumeratedLiterals(
   {},
 );
 
-Fruits.values; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
+Fruits.members; // Typed as readonly ["apple", "banana", "blueberry", "orange"]
 ```
 
 ##### `models` (_property_)
@@ -528,11 +625,11 @@ Fruits.models;
 ##### `assert` (_method_)
 
 A type assertion that throws an [`InvalidLiteralValueError`][InvalidLiteralValueError] if the
-provided value is not in the set of constant string literal values on the
-[`EnumeratedLiterals`][EnumeratedLiterals] instance.
+provided value is not in the set of constant string literal values on the [EnumeratedLiterals
+instance][instance].
 
 ```ts
-<L extends Literals>(value: unknown, errorMessage?: string): asserts value is LiteralsValue<L>;
+<L extends Literals>(value: unknown, errorMessage?: string): asserts value is LiteralsMember<L>;
 ```
 
 ###### Example
@@ -541,7 +638,7 @@ provided value is not in the set of constant string literal values on the
 import { enumeratedLiterals } from "enumerated-literals";
 
 const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
-type Fruit = EnumeratedLiteralType<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
+type Fruit = EnumeratedLiteralMember<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
 
 function processFruit(fruit: Fruit) { ... }
 
@@ -554,11 +651,11 @@ function process(value: unknown) {
 ##### `parse` (_method_)
 
 Returns the provided value, typed as a value in the set of constant string literal values on the
-[`EnumeratedLiterals`][EnumeratedLiterals] instance, if the value is indeed in that set. Otherwise,
-throws an [`InvalidLiteralValueError`][InvalidLiteralValueError].
+[EnumeratedLiterals][instance] instance, if the value is indeed in that set. Otherwise, throws an
+[`InvalidLiteralValueError`][InvalidLiteralValueError].
 
 ```ts
-(v: unknown, errorMessage?: string): LiteralsValue<L>;
+(v: unknown, errorMessage?: string): LiteralsMember<L>;
 ```
 
 ###### Example
@@ -567,7 +664,7 @@ throws an [`InvalidLiteralValueError`][InvalidLiteralValueError].
 import { enumeratedLiterals } from "enumerated-literals";
 
 const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
-type Fruit = EnumeratedLiteralType<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
+type Fruit = EnumeratedLiteralMember<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
 
 function processFruit(fruit: Fruit) { ... }
 
@@ -580,10 +677,10 @@ function process(value: unknown) {
 ##### `contains` (_method_)
 
 A typeguard that returns whether or not the provided value is in the set of constant string literal
-values on the [`EnumeratedLiterals`][EnumeratedLiterals] instance.
+values on the [EnumeratedLiterals][instance] instance.
 
 ```ts
-(v: unknown): v is LiteralsValue<L>;
+(v: unknown): v is LiteralsMember<L>;
 ```
 
 ###### Example
@@ -592,7 +689,7 @@ values on the [`EnumeratedLiterals`][EnumeratedLiterals] instance.
 import { enumeratedLiterals } from "enumerated-literals";
 
 const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
-type Fruit = EnumeratedLiteralType<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
+type Fruit = EnumeratedLiteralMember<typeof Fruits>; // "apple" | "banana" | "blueberry" | "orange"
 
 function processFruit(fruit: Fruit) { ... }
 
@@ -607,13 +704,13 @@ function process(value: unknown) {
 ##### `getModel` (_method_)
 
 Returns the model associated with a specific constant string literal value on the
-[`EnumeratedLiterals`][EnumeratedLiterals] instance. Throws an
+[EnumeratedLiterals][instance] instance. Throws an
 [`InvalidLiteralValueError`][InvalidLiteralValueError] if the provided value is not a specific
-constant string literal on the [`EnumeratedLiterals`][EnumeratedLiterals] instance - however, the
-method is typed such that the compiler will fail if you attempt to provide an invalid value.
+constant string literal on the [EnumeratedLiterals][instance] instance - however, the method is
+typed such that the compiler will fail if you attempt to provide an invalid value.
 
 ```ts
-<V extends LiteralsValue<L>>(v: V): LiteralsModel<L, V>;
+<V extends LiteralsMember<L>>(v: V): LiteralsModel<L, V>;
 ```
 
 ###### Example
@@ -630,19 +727,19 @@ Fruits.getModel("apple");
 ##### `getModelSafe` (_method_)
 
 Returns the model associated with a specific constant string literal value on the
-[`EnumeratedLiterals`][EnumeratedLiterals] instance if that provided value is in fact on the
-[`EnumeratedLiterals`][EnumeratedLiterals] instance.
+[EnumeratedLiterals][instance] instance if that provided value is in fact on the [EnumeratedLiterals
+instance][instance].
 
 ```ts
 <O extends GetModelSafeOptions>(value: unknown, opts: O): GetModelSafeRT<L, O>
 ```
 
 In other words, this method does not assume that the provided value is in the set of constant string
-literals on the [`EnumeratedLiterals`][EnumeratedLiterals] instance, but instead will either return
-`null` (if `options.strict` is `false` or not provided) or throw an
+literals on the [EnumeratedLiterals][instance] instance, but instead will either return `null` (if
+`options.strict` is `false` or not provided) or throw an
 [`InvalidLiteralValueError`][InvalidLiteralValueError] (if `options.strict` is `true`) if the
-provided value is not in the set of constant string literals on the
-[`EnumeratedLiterals`][EnumeratedLiterals] instance.
+provided value is not in the set of constant string literals on the [EnumeratedLiterals
+instance][instance].
 
 ###### Example
 
@@ -677,10 +774,10 @@ Fruits.getModelSafe(v, {});
 ##### `getAttribute` (_method_)
 
 Returns the value of an attribute, `N`, on the model associated with a specific value on the
-[`EnumeratedLiterals`][EnumeratedLiterals] instance.
+[EnumeratedLiterals][instance] instance.
 
 ```ts
-<V extends LiteralsValue<L>, N extends LiteralsModelAttributeName<L>>(value: V, attribute: N): LiteralsAttributeValue<L, V, N>
+<V extends LiteralsMember<L>, N extends LiteralsModelAttributeName<L>>(value: V, attribute: N): LiteralsAttributeValue<L, V, N>
 ```
 
 ###### Example
@@ -704,7 +801,7 @@ Fruits.getAttribute("apple", "description"); // Typed as "A red fruit"
 ##### `getAttributes` (_method_)
 
 Returns the values for a given attribute, `N`, on each model that is associated with the
-[`EnumeratedLiterals`][EnumeratedLiterals] instance.
+[EnumeratedLiterals][instance] instance.
 
 ```ts
 <N extends LiteralsModelAttributeName<L>>(attribute: N): LiteralsAttributeValues<L, N>
@@ -730,11 +827,11 @@ Fruits.getAttributes("label"); // readonly ["Apple", "Banana", "Blueberry", "Ora
 
 ##### `pick` (_method_)
 
-Returns a new [`EnumeratedLiterals`][EnumeratedLiterals] instance that consists of just the values
-that are provided to the method.
+Returns a new [EnumeratedLiterals][instance] instance that consists of just the values that are
+provided to the method.
 
 ```ts
-<T extends readonly LiteralsValues<L>[number][], Ot extends EnumeratedLiteralsDynamicOptions<ExtractLiterals<L, T>>>(vs: T, opts?: Ot): EnumeratedLiterals<
+<T extends readonly LiteralsMembers<L>[number][], Ot extends EnumeratedLiteralsDynamicOptions<ExtractLiterals<L, T>>>(vs: T, opts?: Ot): EnumeratedLiterals<
   ExtractLiterals<L, T>,
   OptionsWithNewSet<ExtractLiterals<L, T>, Ot, L, O>
 >
@@ -748,16 +845,16 @@ import { enumeratedLiterals } from "enumerated-literals";
 const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
 const RoundFruits = Fruits.pick(["apple", "orange"] as const);
 
-RoundFruits.values; // readonly ["apple", "orange"]
+RoundFruits.members; // readonly ["apple", "orange"]
 ```
 
 ##### `omit` (_method_)
 
-Returns a new [`EnumeratedLiterals`][EnumeratedLiterals] instance that consists of just the values
-on the instance exluding those that are provided to the method.
+Returns a new [EnumeratedLiterals][instance] instance that consists of just the values on the
+instance exluding those that are provided to the method.
 
 ```ts
-<T extends readonly LiteralsValues<L>[number][], Ot extends EnumeratedLiteralsDynamicOptions<ExcludeLiterals<L, T>>>(vs: T, opts?: Ot): EnumeratedLiterals<
+<T extends readonly LiteralsMembers<L>[number][], Ot extends EnumeratedLiteralsDynamicOptions<ExcludeLiterals<L, T>>>(vs: T, opts?: Ot): EnumeratedLiterals<
   ExcludeLiterals<L, T>,
   OptionsWithNewSet<ExcludeLiterals<L, T>, Ot, L, O>
 >
@@ -771,13 +868,13 @@ import { enumeratedLiterals } from "enumerated-literals";
 const Fruits = enumeratedLiterals(["apple", "banana", "blueberry", "orange"] as const, {});
 const RoundFruits = Fruits.omit(["banana", "blueberry"] as const);
 
-RoundFruits.values; // readonly ["apple", "orange"]
+RoundFruits.members; // readonly ["apple", "orange"]
 ```
 
 ##### `humanize` (_method_)
 
 Returns a human readable string representing the constant string literal values associated with the
-[`EnumeratedLiterals`][EnumeratedLiterals] instance.
+[EnumeratedLiterals][instance] instance.
 
 ```ts
 (options?: HumanizeListOptions<string>): string;
@@ -797,8 +894,8 @@ Fruits.humanize({ conjunction: "or" });
 ##### `throwInvalidValue` (_method_)
 
 Throws an [`InvalidLiteralValueError`][InvalidLiteralValueError] with a message that is generated
-based on optionally provided options to the [`EnumeratedLiterals`][EnumeratedLiterals] instance on
-instantiation and/or the constant string literal values that are associated with the instance.
+based on optionally provided options to the [EnumeratedLiterals Instance] on instantiation and/or the
+constant string literal values that are associated with the instance.
 
 ```ts
 (v: unknown, errorMessage?: string): never;
@@ -818,7 +915,9 @@ Fruits.throwInvalidValue("cucumber");
 
 [InvalidLiteralValueError]:
   https://github.com/nickmflorin/enumerated-literals/blob/1d5d8fa4a9e07a646a627cc245d098ee97b71668/src/literals/errors.ts#L34
-[EnumeratedLiterals]:
-  https://github.com/nickmflorin/enumerated-literals/blob/1d5d8fa4a9e07a646a627cc245d098ee97b71668/src/literals/exposed.ts#L75
 [EnumeratedLiteralsOptions]:
   https://github.com/nickmflorin/enumerated-literals/blob/1d5d8fa4a9e07a646a627cc245d098ee97b71668/src/literals/options.ts#L68
+[instance]: #the-enumeratedliterals-instance
+[member]: #the-enumeratedliterals-members
+[accessor]: #the-enumeratedliterals-accessors
+[model]: #the-enumeratedliterals-models

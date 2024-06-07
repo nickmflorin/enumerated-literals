@@ -22,11 +22,12 @@ describe(
           ] as const,
           {},
         );
+
         test.each(MODELS.map(m => m[1]))("(value = %s)", value => {
-          expect(Literals.parse(value)).toBe(value);
+          expect(Literals.parse(value, {})).toBe(value);
         });
         it("throws an error when the value is not in the literals model", () => {
-          expect(() => Literals.parse("grape")).toThrow();
+          expect(() => Literals.parse("grape", {})).toThrow();
         });
       },
     );
@@ -37,10 +38,10 @@ describe(
         const VALUES = ["apple", "banana", "blueberry", "orange"] as const;
         const Literals = enumeratedLiterals(VALUES, {});
         test.each(VALUES)("(value = %s)", value => {
-          expect(Literals.parse(value)).toBe(value);
+          expect(Literals.parse(value, {})).toBe(value);
         });
         it("throws an error when the value is not in the literals model", () => {
-          expect(() => Literals.parse("grape")).toThrow();
+          expect(() => Literals.parse("grape", {})).toThrow();
         });
       },
     );
