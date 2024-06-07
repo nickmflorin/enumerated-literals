@@ -76,7 +76,7 @@ values related to the constant string literals the instance is associated with (
 
 The following terms will be referenced throughout this documentation:
 
-#### The [`EnumeratedLiterals`][instance] instance Instance
+#### The `EnumeratedLiterals` Instance
 
 The `EnumeratedLiterals` object that is created and returned by the `enumeratedLiterals` method
 (e.g. `Fruits`):
