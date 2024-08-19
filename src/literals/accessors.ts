@@ -1,4 +1,4 @@
-import { type Literals, type LiteralsBaseModelArray, type LiteralsArray } from "./core";
+import { type Literals } from "./core";
 import { isLiteralModel } from "./core";
 import {
   type EnumeratedLiteralsOptions,
@@ -121,34 +121,15 @@ export type LiteralsAccessor<
     >
   : never;
 
-export type EnumeratedLiteralsBaseModelArrayAccessors<
-  L extends LiteralsBaseModelArray,
-  O extends EnumeratedLiteralsOptions<L>,
-> = {
-  // It is important to condition the key on string such that it distributes over the union.
-  [key in keyof L as key extends string
-    ? L[key] extends { accessor: infer A extends string }
-      ? LiteralsAccessor<A, L, O>
-      : L[key] extends { value: infer V extends string }
-        ? LiteralsAccessor<V, L, O>
-        : never
-    : never]: L[key] extends { value: infer V extends string } ? V : never;
-};
-
-export type EnumeratedLiteralsArrayAccessors<
-  L extends LiteralsArray,
-  O extends EnumeratedLiteralsOptions<L>,
-> = {
-  [key in L[number] as key extends string ? LiteralsAccessor<key, L, O> : never]: key;
-};
-
 type EnumeratedLiteralsAccessorKey<L extends Literals> = L extends readonly (infer Li extends
   string)[]
   ? Li
   : L extends readonly (infer Li)[]
     ? Li extends { accessor: infer A extends string }
       ? A
-      : never
+      : Li extends { value: infer V extends string }
+        ? V
+        : never
     : never;
 
 export type EnumeratedLiteralsAccessors<
