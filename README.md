@@ -16,15 +16,18 @@ At it's core, the `enumerated-literals` package provides a method, `enumeratedLi
 used to define a set of constant string literals in an `enum`-like fashion:
 
 ```ts
-enumeratedLiterals<L extends Literals, O extends EnumeratedLiteralsOptions<L>>(literals: L, options: O): EnumeratedLiterals<L, O>
+enumeratedLiterals<L extends Literals, O extends EnumeratedLiteralsOptions<L>>(
+  literals: L,
+  options: O
+): EnumeratedLiterals<L, O>
 ```
 
 The first argument to the `enumeratedLiterals` method, `L` (or `Literals`), should be a `const`
-(`readonly`) array of `string` values (`string[]`) or `object` values ([models][model]), each of
+array of `string` values (`readonly string[]`) or `object` values (termed [models][model]), each of
 which contains a `value` key (`{ value: string }`[]).
 
 The second argument provided to the `enumeratedLiterals` method, `O` (or
-[`EnumeratedLiteralsOptions<L>`][EnumeratedLiteralsOptions]), should be an `object` type that
+[`EnumeratedLiteralsOptions<L>`][options]), should be an `object` type that
 contains the options for the instance (see [Configuration Options][options]).
 
 ###### Example
@@ -44,8 +47,8 @@ doSomethingWithFruit("apple");
 
 ### Why Not `enum`(s)?
 
-The primary motivation for the `enumerated-literals` package was the fact that constant string
-literals are not assignable to their equivalent `enum` members:
+The primary and original motivation for the `enumerated-literals` package was the fact that
+constant string literals are not assignable to their equivalent `enum` members:
 
 ```ts
 enum Fruits {
@@ -64,11 +67,11 @@ const appleColor = getFruitColor("apple");
 ```
 
 This means that whenever the `getFruitColor` function is used throughout an application or codebase,
-it requires also importing `Fruits`. While this might seem like a small inconvenience, its
-inflexibility can be a pain point in larger applications with a significant number of constants
-defined in `enum` fashion.
+it requires also importing `Fruits`, and referencing the argument as `Fruits.APPLE`. While this might
+seem like a small inconvenience, its inflexibility can be a pain point in larger applications
+with a significant number of constants that benefit from being defined in an `enum`-like fashion.
 
-Additionally, the [EnumeratedLiterals Instance] offers built-in type-checking methods and strongly typed
+Additionally, the [`EnumeratedLiterals`][instance] instance offers built-in type-checking methods and strongly typed
 properties, which provide a more convenient and organized way of making assertions and type-checking
 values related to the constant string literals the instance is associated with (see [Built-In Type Checking](#built-in-type-checking)).
 
