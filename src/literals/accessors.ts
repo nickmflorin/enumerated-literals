@@ -123,12 +123,12 @@ export type LiteralsAccessor<
 
 type EnumeratedLiteralsAccessorKey<L extends Literals> = L extends readonly (infer Li extends
   string)[]
-  ? Li
+  ? { accessor: Li; value: Li }
   : L extends readonly (infer Li)[]
-    ? Li extends { accessor: infer A extends string }
-      ? A
+    ? Li extends { accessor: infer A extends string; value: infer V extends string }
+      ? { accessor: A; value: V }
       : Li extends { value: infer V extends string }
-        ? V
+        ? { accessor: V; value: V }
         : never
     : never;
 
@@ -136,7 +136,11 @@ export type EnumeratedLiteralsAccessors<
   L extends Literals,
   O extends EnumeratedLiteralsOptions<L>,
 > = {
-  [key in EnumeratedLiteralsAccessorKey<L> as LiteralsAccessor<key, L, O>]: key;
+  [key in EnumeratedLiteralsAccessorKey<L> as LiteralsAccessor<
+    key["accessor"],
+    L,
+    O
+  >]: key["value"];
 };
 
 const AccessorRegex = /^[A-Za-z0-9-_\s]*$/;

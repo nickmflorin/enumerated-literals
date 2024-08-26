@@ -527,7 +527,7 @@ method in order to control error messages and/or formatting of [accessors][acces
 The [Configuration Options][options] that can be provided to the `enumeratedLiterals` method are as
 follows:
 
-1. **`invalidValueErrorMessage`**:
+1. **`invalidValueErrorMessage`**
 
    A function that can be used to format the error message of the `InvalidLiteralValueError` that is
    thrown when an invalid value is encountered by the [`EnumeratedLiterals`][instance] instance.
