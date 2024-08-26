@@ -123,7 +123,9 @@ export type LiteralsAccessor<
 
 type EnumeratedLiteralsAccessorKey<L extends Literals> = L extends readonly (infer Li extends
   string)[]
-  ? { accessor: Li; value: Li }
+  ? Li extends string
+    ? { accessor: Li; value: Li }
+    : never
   : L extends readonly (infer Li)[]
     ? Li extends { accessor: infer A extends string; value: infer V extends string }
       ? { accessor: A; value: V }
